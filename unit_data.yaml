@@ -1,0 +1,366 @@
+Archer:
+  attack: 20
+  cost: 3
+  defense: 10
+  hp: 100
+  range: 2
+  traits:
+  - dash
+  - fortify
+BabyDragon:
+  attack: 30
+  cost: 10
+  defense: 30
+  hp: 150
+  range: 1
+  traits:
+  - dash
+  - escape
+  - grow
+  - scout
+  - static
+BattleSled:
+  attack: 30
+  cost: 5
+  defense: 20
+  hp: 150
+  range: 1
+  traits:
+  - dash
+  - escape
+  - skate
+Catapult:
+  attack: 40
+  cost: 8
+  defense: 0
+  hp: 100
+  range: 3
+  traits:
+  - stiff
+Centipede:
+  attack: 40
+  cost: 10
+  defense: 30
+  hp: 200
+  range: 1
+  traits:
+  - creep
+  - dash
+  - eat
+  - static
+Cloak:
+  attack: 20
+  cost: 8
+  defense: 5
+  hp: 50
+  range: 1
+  traits:
+  - creep
+  - dash
+  - hide
+  - infiltrate
+  - scout
+  - static
+  - stiff
+Crab:
+  attack: 40
+  cost: 10
+  defense: 40
+  hp: 400
+  range: 1
+  traits:
+  - autoflood
+  - escape
+  - static
+Dagger:
+  attack: 20
+  cost: 2
+  defense: 20
+  hp: 100
+  range: 1
+  traits:
+  - dash
+  - independent
+  - static
+  - surprise
+DefaultWarrior:
+  attack: 20
+  cost: 2
+  defense: 20
+  hp: 100
+  range: 1
+  traits:
+  - dash
+  - fortify
+Defender:
+  attack: 10
+  cost: 3
+  defense: 30
+  hp: 150
+  range: 1
+  traits:
+  - fortify
+Doomux:
+  attack: 40
+  cost: 10
+  defense: 20
+  hp: 200
+  range: 1
+  traits:
+  - creep
+  - dash
+  - explode
+Egg:
+  attack: 0
+  cost: 10
+  defense: 20
+  hp: 100
+  range: 1
+  traits:
+  - fortify
+  - grow
+  - static
+  - stiff
+Exida:
+  attack: 30
+  cost: 8
+  defense: 10
+  hp: 100
+  range: 3
+  traits:
+  - poison
+FireDragon:
+  attack: 40
+  cost: 10
+  defense: 30
+  hp: 200
+  range: 2
+  traits:
+  - dash
+  - scout
+  - splash
+  - static
+Gaami:
+  attack: 40
+  cost: 10
+  defense: 30
+  hp: 300
+  range: 1
+  traits:
+  - auto_freeze
+  - freeze_area
+  - static
+Giant:
+  attack: 50
+  cost: 10
+  defense: 40
+  hp: 400
+  range: 1
+  traits:
+  - static
+Hexapod:
+  attack: 30
+  cost: 3
+  defense: 10
+  hp: 50
+  range: 1
+  traits:
+  - creep
+  - dash
+  - escape
+  - sneak
+IceArcher:
+  attack: 0
+  cost: 3
+  defense: 10
+  hp: 100
+  range: 2
+  traits:
+  - dash
+  - fortify
+  - freeze
+  - stiff
+IceFortress:
+  attack: 40
+  cost: 15
+  defense: 30
+  hp: 200
+  range: 2
+  traits:
+  - scout
+  - skate
+Jelly:
+  attack: 20
+  cost: 8
+  defense: 20
+  hp: 200
+  range: 1
+  traits:
+  - static
+  - stiff
+  - tentacles
+Juggernaut:
+  attack: 40
+  cost: 10
+  defense: 40
+  hp: 400
+  range: 1
+  traits:
+  - carry
+  - static
+  - stiff
+  - stomp
+Kiton:
+  attack: 10
+  cost: 3
+  defense: 30
+  hp: 150
+  range: 1
+  traits:
+  - poison
+Knight:
+  attack: 35
+  cost: 8
+  defense: 10
+  hp: 100
+  range: 1
+  traits:
+  - dash
+  - persist
+MindBender:
+  attack: 0
+  cost: 5
+  defense: 10
+  hp: 100
+  range: 1
+  traits:
+  - convert
+  - heal
+  - stiff
+Mooni:
+  attack: 0
+  cost: 5
+  defense: 10
+  hp: 100
+  range: 1
+  traits:
+  - auto_freeze
+  - skate
+  - static
+  - stiff
+Phychi:
+  attack: 10
+  cost: 3
+  defense: 10
+  hp: 50
+  range: 2
+  traits:
+  - dash
+  - poison
+  - surprise
+Pirate:
+  attack: 20
+  cost: 2
+  defense: 10
+  hp: 100
+  range: 1
+  traits:
+  - dash
+  - independent
+  - static
+  - surprise
+Polytaur:
+  attack: 30
+  cost: 3
+  defense: 10
+  hp: 150
+  range: 1
+  traits:
+  - dash
+  - fortify
+  - independent
+  - static
+Puffer:
+  attack: 40
+  cost: 8
+  defense: 0
+  hp: 100
+  range: 3
+  traits:
+  - drench
+Raychi:
+  attack: 30
+  cost: 8
+  defense: 20
+  hp: 150
+  range: 1
+  traits:
+  - creep
+  - dash
+  - explode
+  - navigate
+Rider:
+  attack: 20
+  cost: 3
+  defense: 10
+  hp: 100
+  range: 1
+  traits:
+  - dash
+  - escape
+  - fortify
+Segment:
+  attack: 20
+  cost: 1
+  defense: 15
+  hp: 50
+  range: 1
+  traits:
+  - explode
+  - static
+  - stiff
+Shaman:
+  attack: 10
+  cost: 5
+  defense: 10
+  hp: 100
+  range: 1
+  traits:
+  - boost
+  - convert
+  - static
+Shark:
+  attack: 35
+  cost: 8
+  defense: 20
+  hp: 100
+  range: 1
+  traits:
+  - dash
+  - surprise
+Swordsman:
+  attack: 30
+  cost: 5
+  defense: 30
+  hp: 150
+  range: 1
+  traits:
+  - dash
+Tridention:
+  attack: 25
+  cost: 8
+  defense: 10
+  hp: 100
+  range: 2
+  traits:
+  - dash
+  - persist
+Warrior:
+  attack: 20
+  cost: 2
+  defense: 20
+  hp: 100
+  range: 1
+  traits:
+  - dash
+  - fortify

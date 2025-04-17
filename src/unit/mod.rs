@@ -179,221 +179,187 @@ impl Unit {
         }
     }
 
-    #[inline(always)]
+    #[inline]
     pub fn attack(&self) -> f32 {
         generated::UNIT_TYPE_DATA[self.unit_type as usize].attack
     }
 
-    #[inline(always)]
+    #[inline]
     pub fn cost(&self) -> u8 {
         generated::UNIT_TYPE_DATA[self.unit_type as usize].cost
     }
 
-    #[inline(always)]
+    #[inline]
     pub fn defense(&self) -> f32 {
         generated::UNIT_TYPE_DATA[self.unit_type as usize].defense
     }
 
+    #[inline]
     pub fn max_hp(&self) -> f32 {
         generated::UNIT_TYPE_DATA[self.unit_type as usize].max_hp
     }
 
-    #[inline(always)]
+    #[inline]
     pub fn name(&self) -> &'static str {
         generated::UNIT_TYPE_DATA[self.unit_type as usize].name
     }
 
-    #[inline(always)]
+    #[inline]
     pub fn range(&self) -> u8 {
         generated::UNIT_TYPE_DATA[self.unit_type as usize].range
     }
 
-    #[inline(always)]
+    #[inline]
     pub fn traits(&self) -> &'static [Trait] {
         generated::UNIT_TYPE_DATA[self.unit_type as usize].traits
     }
 
-    #[inline(always)]
+    #[inline]
     pub fn health_ratio(&self) -> f32 {
         self.current_hp as f32 / self.max_hp() as f32
     }
 
-    #[inline(always)]
+
     pub fn archer() -> Self {
         Unit::new(UnitType::Archer, None, None)
     }
 
-    #[inline(always)]
     pub fn baby_dragon() -> Self {
         Unit::new(UnitType::BabyDragon, None, None)
     }
 
-    #[inline(always)]
     pub fn battle_sled() -> Self {
         Unit::new(UnitType::BattleSled, None, None)
     }
 
-    #[inline(always)]
     pub fn catapult() -> Self {
         Unit::new(UnitType::Catapult, None, None)
     }
 
-    #[inline(always)]
     pub fn centipede() -> Self {
         Unit::new(UnitType::Centipede, None, None)
     }
 
-    #[inline(always)]
     pub fn cloak() -> Self {
         Unit::new(UnitType::Cloak, None, None)
     }
 
-    #[inline(always)]
     pub fn crab() -> Self {
         Unit::new(UnitType::Crab, None, None)
     }
 
-    #[inline(always)]
     pub fn dagger() -> Self {
         Unit::new(UnitType::Dagger, None, None)
     }
 
-    #[inline(always)]
     pub fn defender() -> Self {
         Unit::new(UnitType::Defender, None, None)
     }
 
-    #[inline(always)]
     pub fn doomux() -> Self {
         Unit::new(UnitType::Doomux, None, None)
     }
 
-    #[inline(always)]
     pub fn egg() -> Self {
         Unit::new(UnitType::Egg, None, None)
     }
 
-    #[inline(always)]
     pub fn exida() -> Self {
         Unit::new(UnitType::Exida, None, None)
     }
 
-    #[inline(always)]
     pub fn fire_dragon() -> Self {
         Unit::new(UnitType::FireDragon, None, None)
     }
 
-    #[inline(always)]
     pub fn gaami() -> Self {
         Unit::new(UnitType::Gaami, None, None)
     }
 
-    #[inline(always)]
     pub fn giant() -> Self {
         Unit::new(UnitType::Giant, None, None)
     }
 
-    #[inline(always)]
     pub fn hexapod() -> Self {
         Unit::new(UnitType::Hexapod, None, None)
     }
 
-    #[inline(always)]
     pub fn ice_archer() -> Self {
         Unit::new(UnitType::IceArcher, None, None)
     }
 
-    #[inline(always)]
     pub fn ice_fortress() -> Self {
         Unit::new(UnitType::IceFortress, None, None)
     }
 
-    #[inline(always)]
     pub fn jelly() -> Self {
         Unit::new(UnitType::Jelly, None, None)
     }
 
-    #[inline(always)]
     pub fn juggernaut() -> Self {
         Unit::new(UnitType::Juggernaut, None, None)
     }
 
-    #[inline(always)]
     pub fn kiton() -> Self {
         Unit::new(UnitType::Kiton, None, None)
     }
 
-    #[inline(always)]
     pub fn knight() -> Self {
         Unit::new(UnitType::Knight, None, None)
     }
 
-    #[inline(always)]
     pub fn mind_bender() -> Self {
         Unit::new(UnitType::MindBender, None, None)
     }
 
-    #[inline(always)]
     pub fn mooni() -> Self {
         Unit::new(UnitType::Mooni, None, None)
     }
 
-    #[inline(always)]
     pub fn phychi() -> Self {
         Unit::new(UnitType::Phychi, None, None)
     }
 
-    #[inline(always)]
     pub fn pirate() -> Self {
         Unit::new(UnitType::Pirate, None, None)
     }
 
-    #[inline(always)]
     pub fn polytaur() -> Self {
         Unit::new(UnitType::Polytaur, None, None)
     }
 
-    #[inline(always)]
     pub fn puffer() -> Self {
         Unit::new(UnitType::Puffer, None, None)
     }
 
-    #[inline(always)]
     pub fn raychi() -> Self {
         Unit::new(UnitType::Raychi, None, None)
     }
 
-    #[inline(always)]
     pub fn rider() -> Self {
         Unit::new(UnitType::Rider, None, None)
     }
 
-    #[inline(always)]
     pub fn segment() -> Self {
         Unit::new(UnitType::Segment, None, None)
     }
 
-    #[inline(always)]
     pub fn shaman() -> Self {
         Unit::new(UnitType::Shaman, None, None)
     }
 
-    #[inline(always)]
     pub fn shark() -> Self {
         Unit::new(UnitType::Shark, None, None)
     }
 
-    #[inline(always)]
     pub fn swordsman() -> Self {
         Unit::new(UnitType::Swordsman, None, None)
     }
 
-    #[inline(always)]
     pub fn tridention() -> Self {
         Unit::new(UnitType::Tridention, None, None)
     }
 
-    #[inline(always)]
     pub fn warrior() -> Self {
         Unit::new(UnitType::Warrior, None, None)
     }

@@ -1,85 +1,72 @@
 pub mod generated;
 
-/// A unit trait
-#[derive(PartialEq, Eq, Hash, Debug)]
-pub enum Trait {
-    /// Allows a unit to carry another unit inside.
-    /// A unit with the carry skill can move to a land tile adjacent to water.
-    /// Doing so releases the unit it was carrying and ends the unit's turn.
-    Carry,
-    /// Allows a unit to convert an enemy unit into a friendly unit by attacking it.
-    Convert,
-    /// Allows a unit to attack after moving in the same turn.
-    Dash,
-    /// Allows a unit to move after attacking in the same turn.
-    Escape,
-    /// Allows a unit to receive a defence bonus in a city.
-    Fortify,
-    /// Gives a unit the Heal Others unit action, which
-    /// heals all adjacent friendly units by up to 4 HP.
-    Heal,
-    /// Allows a unit to attack again immediately after killing an enemy unit.
-    /// There is no limit on the number of kills in a single turn.
-    Persist,
-    /// Allows a unit to explore a 5x5 area instead of a 3x3 area.
-    Scout,
-    /// Allows a unit to damage or poison enemy units adjacent to the targeted unit.
-    Splash,
-    /// Prevents a unit from becoming a veteran.
-    Static,
-    /// Prevents a unit from retaliating when attacked by an enemy unit.
-    Stiff,
-    /// Causes a unit to deal damage to all adjacent enemy units when it moves.
-    Stomp,
-    /// Prevents a unit from triggering retaliation attacks when attacking an enemy unit.
-    Surprise,
-    /// Allows a unit to ignore movement barriers imposed by terrain.
-    Creep,
-    /// Allows a unit to hide itself and become invisible to enemies when it moves.
-    Hide,
-    /// Allows a unit to incite a revolt and spawn Daggers by entering an enemy city.
-    Infiltrate,
-    /// Allows a unit to automatically flood any tile it moves onto.
-    Autoflood,
-    /// Allows a unit to flood any tile it attacks.
-    Drench,
-    /// Allows a unit to damage any enemy that moves next to it,
-    /// as well as when it moves next to an enemy or when it is trained.
-    Tentacles,
-    /// Allows a unit to grow into a different unit after a given number of turns.
-    Grow,
-    /// Units with this skill do not take up a population slot in or belong to any city.
-    Independent,
-    /// Allows a unit to automatically freeze adjacent enemy units and water tiles
-    /// (turning them into ice tiles) as it moves.
-    AutoFreeze,
-    /// Allows a unit to freeze enemy units it attacks.
-    Freeze,
-    /// Gives a unit the Freeze Area unit action, which freezes adjacent enemy units,
-    /// freezes adjacent water tiles into ice tiles, and converts adjacent land tiles to the
-    /// style of the tribe the unit belongs to.
-    FreezeArea,
-    /// Doubles movement on ice but limits movement to one and prohibits the use of the
-    /// dash and escape skills on land.
-    Skate,
-    /// Gives a unit the Boost unit action, which boosts all adjacent friendly units by
-    /// increasing their attack by 0.5 and movement by 1 until their next action
-    /// (excluding moving).
-    Boost,
-    /// Allows a unit to grow in length for every kill.
-    Eat,
-    /// Gives a unit the Explode unit action, which damages using the unit's attack value
-    /// and poisons all adjacent enemy units, kills the unit itself, and leaves in its place
-    /// spores (on land) or Algae (on water).
-    Explode,
-    /// Allows a unit to move in ocean even if no prerequisite
-    /// technology is researched but prevents the unit from moving
-    /// onto land, except for capturing cities and villages.
-    Navigate,
-    /// Allows a unit to poison enemy units it attacks.
-    Poison,
-    /// Allows a unit to ignore movement barriers imposed by enemy units.
-    Sneak,
+bitflags::bitflags! {
+    /// A unit trait
+    #[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
+    pub struct Traits: u32 {
+        /// Allows a unit to carry another unit inside.
+        const CARRY = 0b00000000_00000000_00000000_00000001;
+        /// Allows a unit to convert an enemy unit into a friendly unit by attacking it.
+        const CONVERT = 0b00000000_00000000_00000000_00000010;
+        /// Allows a unit to attack after moving in the same turn.
+        const DASH = 0b00000000_00000000_00000000_00000100;
+        /// Allows a unit to move after attacking in the same turn.
+        const ESCAPE = 0b00000000_00000000_00000000_00001000;
+        /// Allows a unit to receive a defence bonus in a city.
+        const FORTIFY = 0b00000000_00000000_00000000_00010000;
+        /// Gives a unit the Heal Others unit action, which heals all adjacent friendly units by up to 4 HP.
+        const HEAL = 0b00000000_00000000_00000000_00100000;
+        /// Allows a unit to attack again immediately after killing an enemy unit.
+        const PERSIST = 0b00000000_00000000_00000000_01000000;
+        /// Allows a unit to explore a 5x5 area instead of a 3x3 area.
+        const SCOUT = 0b00000000_00000000_00000000_10000000;
+        /// Allows a unit to damage or poison enemy units adjacent to the targeted unit.
+        const SPLASH = 0b00000000_00000001_00000000_00000000;
+        /// Prevents a unit from becoming a veteran.
+        const STATIC = 0b00000000_00000010_00000000_00000000;
+        /// Prevents a unit from retaliating when attacked by an enemy unit.
+        const STIFF = 0b00000000_00000100_00000000_00000000;
+        /// Causes a unit to deal damage to all adjacent enemy units when it moves.
+        const STOMP = 0b00000000_00001000_00000000_00000000;
+        /// Prevents a unit from triggering retaliation attacks when attacking an enemy unit.
+        const SURPRISE = 0b00000000_00010000_00000000_00000000;
+        /// Allows a unit to ignore movement barriers imposed by terrain.
+        const CREEP = 0b00000000_00100000_00000000_00000000;
+        /// Allows a unit to hide itself and become invisible to enemies when it moves.
+        const HIDE = 0b00000000_01000000_00000000_00000000;
+        /// Allows a unit to incite a revolt and spawn Daggers by entering an enemy city.
+        const INFILTRATE = 0b00000000_10000000_00000000_00000000;
+        /// Allows a unit to automatically flood any tile it moves onto.
+        const AUTOFLOOD = 0b00000001_00000000_00000000_00000000;
+        /// Allows a unit to flood any tile it attacks.
+        const DRENCH = 0b00000010_00000000_00000000_00000000;
+        /// Allows a unit to damage any enemy that moves next to it, as well as when it moves next to an enemy or when it is trained.
+        const TENTACLES = 0b00000100_00000000_00000000_00000000;
+        /// Allows a unit to grow into a different unit after a given number of turns.
+        const GROW = 0b00001000_00000000_00000000_00000000;
+        /// Units with this skill do not take up a population slot in or belong to any city.
+        const INDEPENDENT = 0b00010000_00000000_00000000_00000000;
+        /// Allows a unit to automatically freeze adjacent enemy units and water tiles (turning them into ice tiles) as it moves.
+        const AUTO_FREEZE = 0b00100000_00000000_00000000_00000000;
+        /// Allows a unit to freeze enemy units it attacks.
+        const FREEZE = 0b01000000_00000000_00000000_00000000;
+        /// Gives a unit the Freeze Area unit action, which freezes adjacent enemy units, freezes adjacent water tiles into ice tiles, and converts adjacent land tiles to the style of the tribe the unit belongs to.
+        const FREEZE_AREA = 0b10000000_00000000_00000000_00000000;
+        /// Doubles movement on ice but limits movement to one and prohibits the use of the dash and escape skills on land.
+        const SKATE = 0b00000000_00000000_00000001_00000000;
+        /// Gives a unit the Boost unit action, which boosts all adjacent friendly units by increasing their attack by 0.5 and movement by 1 until their next action (excluding moving).
+        const BOOST = 0b00000000_00000000_00000010_00000000;
+        /// Allows a unit to grow in length for every kill.
+        const EAT = 0b00000000_00000000_00000100_00000000;
+        /// Gives a unit the Explode unit action, which damages using the unit's attack value and poisons all adjacent enemy units, kills the unit itself, and leaves in its place spores (on land) or Algae (on water).
+        const EXPLODE = 0b00000000_00000000_00001000_00000000;
+        /// Allows a unit to move in ocean even if no prerequisite technology is researched but prevents the unit from moving onto land, except for capturing cities and villages.
+        const NAVIGATE = 0b00000000_00000000_00010000_00000000;
+        /// Allows a unit to poison enemy units it attacks.
+        const POISON = 0b00000000_00000000_00100000_00000000;
+        /// Allows a unit to ignore movement barriers imposed by enemy units.
+        const SNEAK = 0b00000000_00000000_01000000_00000000;
+    }
 }
 
 bitflags::bitflags! {
@@ -116,7 +103,7 @@ pub struct UnitTypeData {
     pub attack: f32,
     pub defense: f32,
     pub range: u8,
-    pub traits: &'static [Trait],
+    pub traits: Traits,
 }
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
@@ -210,7 +197,7 @@ impl Unit {
     }
 
     #[inline]
-    pub fn traits(&self) -> &'static [Trait] {
+    pub fn traits(&self) -> Traits {
         generated::UNIT_TYPE_DATA[self.unit_type as usize].traits
     }
 

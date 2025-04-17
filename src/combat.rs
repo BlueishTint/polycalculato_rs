@@ -1,6 +1,4 @@
-use std::ops::Deref;
-
-use crate::unit::{StatusEffects, Trait, Unit};
+use crate::unit::{StatusEffects, Traits, Unit};
 
 fn calculate_damage(
     attack: f32,
@@ -13,6 +11,11 @@ fn calculate_damage(
     let attack_force = attack * attacker_health_ratio;
     let defense_force = defense * defender_health_ratio * defense_bonus;
     let total_damage = attack_force + defense_force;
+
+    if total_damage == 0.0 {
+        return [0.0, 0.0];
+    }
+
     let to_defender = (attack_force / total_damage * attack * 4.5).round();
     let to_attacker = (defense_force / total_damage * defense * 4.5).round();
 
@@ -21,22 +24,6 @@ fn calculate_damage(
     } else {
         [to_attacker, to_defender]
     }
-}
-
-fn calculate_splash_damage(
-    attack: f32,
-    defense: f32,
-    attacker_health_ratio: f32,
-    defender_health_ratio: f32,
-    defense_bonus: f32,
-) -> [f32; 2] {
-    let attack_force = attack * attacker_health_ratio;
-    let defense_force = defense * defender_health_ratio * defense_bonus;
-    let total_damage = attack_force + defense_force;
-    let to_defender = (attack_force / total_damage * attack * 4.5).round() / 2.0;
-    let to_attacker = (defense_force / total_damage * defense * 4.5).round() / 2.0;
-
-    [to_attacker, to_defender]
 }
 
 fn calculate_attacker_damage(
@@ -49,34 +36,40 @@ fn calculate_attacker_damage(
     let attack_force = attack * attacker_health_ratio;
     let defense_force = defense * defender_health_ratio * defense_bonus;
     let total_damage = attack_force + defense_force;
+
+    if total_damage == 0.0 {
+        return 0.0;
+    }
+
     let to_defender = (attack_force / total_damage * attack * 4.5).round();
 
     to_defender
 }
 
 fn calculate_status_effects(
-    attacker_traits: &'static [Trait],
-    defender_traits: &'static [Trait],
+    attacker_traits: Traits,
+    defender_traits: Traits,
 ) -> [StatusEffects; 2] {
     let mut to_attacker = StatusEffects::empty();
     let mut to_defender = StatusEffects::empty();
 
-    if attacker_traits.contains(&Trait::Poison) {
+    if attacker_traits.contains(Traits::POISON) {
         to_defender.insert(StatusEffects::POISONED);
     }
-    if attacker_traits.contains(&Trait::Convert) {
+    if attacker_traits.contains(Traits::CONVERT) {
         to_defender.insert(StatusEffects::CONVERTED);
     }
-    if attacker_traits.contains(&Trait::Freeze) {
+    if attacker_traits.contains(Traits::FREEZE) {
         to_defender.insert(StatusEffects::FROZEN);
     }
-    if defender_traits.contains(&Trait::Poison) {
+    if defender_traits.contains(Traits::POISON) {
         to_attacker.insert(StatusEffects::POISONED);
     }
 
     [to_attacker, to_defender]
 }
 
+#[derive(Debug)]
 pub struct UnitResult {
     pub damage: f32,
     pub status_effects: StatusEffects,
@@ -89,8 +82,8 @@ pub fn single_combat(attacker: &Unit, defender: &Unit) -> (UnitResult, UnitResul
     let mut tentacle_damage = 0f32;
     let mut takes_retaliation = false;
 
-    if defender_traits.contains(&Trait::Tentacles) {
-        if attacker_traits.contains(&Trait::Tentacles) {
+    if defender_traits.contains(Traits::TENTACLES) {
+        if attacker_traits.contains(Traits::TENTACLES) {
             takes_retaliation = true;
         } else if attacker.range() <= defender.range() {
             tentacle_damage = calculate_attacker_damage(
@@ -120,10 +113,10 @@ pub fn single_combat(attacker: &Unit, defender: &Unit) -> (UnitResult, UnitResul
             .contains(StatusEffects::TAKES_RETALIATION)
         || !(attacker.range() > defender.range()
             || (defender.current_hp - damage_to_defender) <= 0.0
-            || defender_traits.contains(&Trait::Stiff)
-            || attacker_traits.contains(&Trait::Surprise)
-            || attacker_traits.contains(&Trait::Convert)
-            || attacker_traits.contains(&Trait::Freeze)
+            || defender_traits.contains(Traits::STIFF)
+            || attacker_traits.contains(Traits::SURPRISE)
+            || attacker_traits.contains(Traits::CONVERT)
+            || attacker_traits.contains(Traits::FREEZE)
             || defender.status_effects.contains(StatusEffects::FROZEN));
 
     let [effects_to_attacker, effects_to_defender] =

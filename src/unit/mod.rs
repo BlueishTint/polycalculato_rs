@@ -1,6 +1,5 @@
 pub mod generated;
 
-
 /// A unit trait
 #[derive(PartialEq, Eq, Hash, Debug)]
 pub enum Trait {
@@ -83,7 +82,6 @@ pub enum Trait {
     Sneak,
 }
 
-
 bitflags::bitflags! {
     /// A unit status effect.
     #[derive(PartialEq, Eq, Hash, Debug)]
@@ -113,11 +111,11 @@ bitflags::bitflags! {
 
 pub struct UnitTypeData {
     pub name: &'static str,
-    pub cost: u32,
-    pub max_hp: u32,
-    pub attack: u32,
-    pub defense: u32,
-    pub range: u32,
+    pub cost: u8,
+    pub max_hp: u16,
+    pub attack: u16,
+    pub defense: u16,
+    pub range: u8,
     pub traits: &'static [Trait],
 }
 
@@ -161,7 +159,6 @@ pub enum UnitType {
     Warrior,
 }
 
-
 pub struct Unit {
     unit_type: UnitType,
     pub current_hp: u32,
@@ -169,7 +166,11 @@ pub struct Unit {
 }
 
 impl Unit {
-    pub fn new(unit_type: UnitType, current_hp: Option<u32>, status_effects: Option<StatusEffects>) -> Self {
+    pub fn new(
+        unit_type: UnitType,
+        current_hp: Option<u32>,
+        status_effects: Option<StatusEffects>,
+    ) -> Self {
         Unit {
             unit_type,
             current_hp: current_hp.unwrap_or(100),
@@ -178,21 +179,21 @@ impl Unit {
     }
 
     #[inline(always)]
-    pub fn attack(&self) -> u32 {
+    pub fn attack(&self) -> u16 {
         generated::UNIT_TYPE_DATA[self.unit_type as usize].attack
     }
 
     #[inline(always)]
-    pub fn cost(&self) -> u32 {
+    pub fn cost(&self) -> u8 {
         generated::UNIT_TYPE_DATA[self.unit_type as usize].cost
     }
 
     #[inline(always)]
-    pub fn defense(&self) -> u32 {
+    pub fn defense(&self) -> u16 {
         generated::UNIT_TYPE_DATA[self.unit_type as usize].defense
     }
     #[inline(always)]
-    pub fn max_hp(&self) -> u32 {
+    pub fn max_hp(&self) -> u16 {
         generated::UNIT_TYPE_DATA[self.unit_type as usize].max_hp
     }
 
@@ -202,7 +203,7 @@ impl Unit {
     }
 
     #[inline(always)]
-    pub fn range(&self) -> u32 {
+    pub fn range(&self) -> u8 {
         generated::UNIT_TYPE_DATA[self.unit_type as usize].range
     }
 
@@ -214,6 +215,181 @@ impl Unit {
     #[inline(always)]
     pub fn health_ratio(&self) -> f32 {
         self.current_hp as f32 / self.max_hp() as f32
+    }
+
+    #[inline(always)]
+    pub fn archer() -> Self {
+        Unit::new(UnitType::Archer, None, None)
+    }
+
+    #[inline(always)]
+    pub fn baby_dragon() -> Self {
+        Unit::new(UnitType::BabyDragon, None, None)
+    }
+
+    #[inline(always)]
+    pub fn battle_sled() -> Self {
+        Unit::new(UnitType::BattleSled, None, None)
+    }
+
+    #[inline(always)]
+    pub fn catapult() -> Self {
+        Unit::new(UnitType::Catapult, None, None)
+    }
+
+    #[inline(always)]
+    pub fn centipede() -> Self {
+        Unit::new(UnitType::Centipede, None, None)
+    }
+
+    #[inline(always)]
+    pub fn cloak() -> Self {
+        Unit::new(UnitType::Cloak, None, None)
+    }
+
+    #[inline(always)]
+    pub fn crab() -> Self {
+        Unit::new(UnitType::Crab, None, None)
+    }
+
+    #[inline(always)]
+    pub fn dagger() -> Self {
+        Unit::new(UnitType::Dagger, None, None)
+    }
+
+    #[inline(always)]
+    pub fn defender() -> Self {
+        Unit::new(UnitType::Defender, None, None)
+    }
+
+    #[inline(always)]
+    pub fn doomux() -> Self {
+        Unit::new(UnitType::Doomux, None, None)
+    }
+
+    #[inline(always)]
+    pub fn egg() -> Self {
+        Unit::new(UnitType::Egg, None, None)
+    }
+
+    #[inline(always)]
+    pub fn exida() -> Self {
+        Unit::new(UnitType::Exida, None, None)
+    }
+
+    #[inline(always)]
+    pub fn fire_dragon() -> Self {
+        Unit::new(UnitType::FireDragon, None, None)
+    }
+
+    #[inline(always)]
+    pub fn gaami() -> Self {
+        Unit::new(UnitType::Gaami, None, None)
+    }
+
+    #[inline(always)]
+    pub fn giant() -> Self {
+        Unit::new(UnitType::Giant, None, None)
+    }
+
+    #[inline(always)]
+    pub fn hexapod() -> Self {
+        Unit::new(UnitType::Hexapod, None, None)
+    }
+
+    #[inline(always)]
+    pub fn ice_archer() -> Self {
+        Unit::new(UnitType::IceArcher, None, None)
+    }
+
+    #[inline(always)]
+    pub fn ice_fortress() -> Self {
+        Unit::new(UnitType::IceFortress, None, None)
+    }
+
+    #[inline(always)]
+    pub fn jelly() -> Self {
+        Unit::new(UnitType::Jelly, None, None)
+    }
+
+    #[inline(always)]
+    pub fn juggernaut() -> Self {
+        Unit::new(UnitType::Juggernaut, None, None)
+    }
+
+    #[inline(always)]
+    pub fn kiton() -> Self {
+        Unit::new(UnitType::Kiton, None, None)
+    }
+
+    #[inline(always)]
+    pub fn knight() -> Self {
+        Unit::new(UnitType::Knight, None, None)
+    }
+
+    #[inline(always)]
+    pub fn mind_bender() -> Self {
+        Unit::new(UnitType::MindBender, None, None)
+    }
+
+    #[inline(always)]
+    pub fn mooni() -> Self {
+        Unit::new(UnitType::Mooni, None, None)
+    }
+
+    #[inline(always)]
+    pub fn phychi() -> Self {
+        Unit::new(UnitType::Phychi, None, None)
+    }
+
+    #[inline(always)]
+    pub fn pirate() -> Self {
+        Unit::new(UnitType::Pirate, None, None)
+    }
+
+    #[inline(always)]
+    pub fn polytaur() -> Self {
+        Unit::new(UnitType::Polytaur, None, None)
+    }
+
+    #[inline(always)]
+    pub fn puffer() -> Self {
+        Unit::new(UnitType::Puffer, None, None)
+    }
+
+    #[inline(always)]
+    pub fn rider() -> Self {
+        Unit::new(UnitType::Rider, None, None)
+    }
+
+    #[inline(always)]
+    pub fn segment() -> Self {
+        Unit::new(UnitType::Segment, None, None)
+    }
+
+    #[inline(always)]
+    pub fn shaman() -> Self {
+        Unit::new(UnitType::Shaman, None, None)
+    }
+
+    #[inline(always)]
+    pub fn shark() -> Self {
+        Unit::new(UnitType::Shark, None, None)
+    }
+
+    #[inline(always)]
+    pub fn swordsman() -> Self {
+        Unit::new(UnitType::Swordsman, None, None)
+    }
+
+    #[inline(always)]
+    pub fn tridention() -> Self {
+        Unit::new(UnitType::Tridention, None, None)
+    }
+
+    #[inline(always)]
+    pub fn warrior() -> Self {
+        Unit::new(UnitType::Warrior, None, None)
     }
 }
 

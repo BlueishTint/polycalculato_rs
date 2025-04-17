@@ -1,13 +1,13 @@
-use std::collections::BTreeMap;
 use serde::Deserialize;
+use std::collections::BTreeMap;
 
 #[derive(Deserialize)]
 struct RawUnitData {
-    attack: u32,
-    cost: u32,
-    defense: u32,
-    hp: u32,
-    range: u32,
+    attack: f32,
+    cost: u8,
+    defense: f32,
+    hp: f32,
+    range: u8,
     traits: Vec<String>,
 }
 
@@ -21,13 +21,15 @@ fn main() {
     out.push_str("pub static UNIT_TYPE_DATA: &[UnitTypeData] = &[\n");
 
     for (name, data) in raw_data {
-        let traits_str = data.traits.iter()
+        let traits_str = data
+            .traits
+            .iter()
             .map(|t| format!("Trait::{}", to_pascal_case(t)))
             .collect::<Vec<_>>()
             .join(", ");
 
         out.push_str(&format!(
-            "    UnitTypeData {{ name: \"{}\", cost: {}, max_hp: {}, attack: {}, defense: {}, range: {}, traits: &[{}] }},\n",
+            "    UnitTypeData {{ name: \"{}\", cost: {}, max_hp: {:?}, attack: {:?}, defense: {:?}, range: {}, traits: &[{}] }},\n",
             name, data.cost, data.hp, data.attack, data.defense, data.range, traits_str
         ));
     }
@@ -39,7 +41,7 @@ fn main() {
 
 /// Converts "fortify" -> "Fortify"
 fn to_pascal_case(s: &str) -> String {
-    s.split('_')              // Split by underscores
+    s.split('_') // Split by underscores
         .map(|word| {
             let mut chars = word.chars();
             match chars.next() {
@@ -47,5 +49,5 @@ fn to_pascal_case(s: &str) -> String {
                 None => String::new(),
             }
         })
-        .collect::<String>()   // Join the words together
+        .collect::<String>() // Join the words together
 }

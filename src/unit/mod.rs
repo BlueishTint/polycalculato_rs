@@ -112,9 +112,9 @@ bitflags::bitflags! {
 pub struct UnitTypeData {
     pub name: &'static str,
     pub cost: u8,
-    pub max_hp: u16,
-    pub attack: u16,
-    pub defense: u16,
+    pub max_hp: f32,
+    pub attack: f32,
+    pub defense: f32,
     pub range: u8,
     pub traits: &'static [Trait],
 }
@@ -180,7 +180,7 @@ impl Unit {
     }
 
     #[inline(always)]
-    pub fn attack(&self) -> u16 {
+    pub fn attack(&self) -> f32 {
         generated::UNIT_TYPE_DATA[self.unit_type as usize].attack
     }
 
@@ -190,11 +190,11 @@ impl Unit {
     }
 
     #[inline(always)]
-    pub fn defense(&self) -> u16 {
+    pub fn defense(&self) -> f32 {
         generated::UNIT_TYPE_DATA[self.unit_type as usize].defense
     }
-    #[inline(always)]
-    pub fn max_hp(&self) -> u16 {
+
+    pub fn max_hp(&self) -> f32 {
         generated::UNIT_TYPE_DATA[self.unit_type as usize].max_hp
     }
 

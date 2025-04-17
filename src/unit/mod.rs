@@ -150,6 +150,7 @@ pub enum UnitType {
     Pirate,
     Polytaur,
     Puffer,
+    Raychi,
     Rider,
     Segment,
     Shaman,
@@ -355,6 +356,11 @@ impl Unit {
     #[inline(always)]
     pub fn puffer() -> Self {
         Unit::new(UnitType::Puffer, None, None)
+    }
+
+    #[inline(always)]
+    pub fn raychi() -> Self {
+        Unit::new(UnitType::Raychi, None, None)
     }
 
     #[inline(always)]

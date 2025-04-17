@@ -2,7 +2,7 @@ pub mod unit;
 
 fn main() {
     // Example usage of the Unit struct
-    let mut unit = unit::Unit::new(unit::UnitType::Archer, Some(80), None);
+    let mut unit = unit::Unit::raychi();
     unit.current_hp = 90;
     println!("Unit type: {:?}", unit.name());
     println!("Max HP: {}", unit.max_hp());

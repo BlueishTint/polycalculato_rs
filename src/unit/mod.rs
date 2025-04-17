@@ -162,19 +162,19 @@ pub enum UnitType {
 
 pub struct Unit {
     unit_type: UnitType,
-    pub current_hp: u32,
+    pub current_hp: f32,
     pub status_effects: StatusEffects,
 }
 
 impl Unit {
     pub fn new(
         unit_type: UnitType,
-        current_hp: Option<u32>,
+        current_hp: Option<f32>,
         status_effects: Option<StatusEffects>,
     ) -> Self {
         Unit {
             unit_type,
-            current_hp: current_hp.unwrap_or(100),
+            current_hp: current_hp.unwrap_or(generated::UNIT_TYPE_DATA[unit_type as usize].max_hp),
             status_effects: status_effects.unwrap_or(StatusEffects::empty()),
         }
     }
@@ -216,9 +216,20 @@ impl Unit {
 
     #[inline]
     pub fn health_ratio(&self) -> f32 {
-        self.current_hp as f32 / self.max_hp() as f32
+        self.current_hp / self.max_hp()
     }
 
+    pub fn defense_bonus(&self) -> f32 {
+        if self.status_effects.contains(StatusEffects::POISONED) {
+            0.7
+        } else if self.status_effects.contains(StatusEffects::WALLED) {
+            3.0
+        } else if self.status_effects.contains(StatusEffects::FORTIFIED) {
+            1.5
+        } else {
+            1.0
+        }
+    }
 
     pub fn archer() -> Self {
         Unit::new(UnitType::Archer, None, None)
@@ -369,7 +380,7 @@ impl Default for Unit {
     fn default() -> Self {
         Unit {
             unit_type: UnitType::DefaultWarrior,
-            current_hp: 100,
+            current_hp: 10.0,
             status_effects: StatusEffects::empty(),
         }
     }

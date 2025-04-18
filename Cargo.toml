@@ -3,9 +3,19 @@ name = "polycalculato-rs"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+bench = false
+
 [dependencies]
 bitflags = "2.9.0"
 
 [build-dependencies]
 serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.9"
+
+[dev-dependencies]
+criterion = "0.5"
+
+[[bench]]
+name = "bench_combat"
+harness = false

@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
-mod combat;
-mod unit;
+pub mod combat;
+pub mod unit;
 
 fn main() {
     let warrior = unit::Unit::warrior();

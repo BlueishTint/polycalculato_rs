@@ -71,7 +71,7 @@ bitflags::bitflags! {
 
 bitflags::bitflags! {
     /// A unit status effect.
-    #[derive(PartialEq, Eq, Hash, Debug)]
+    #[derive(PartialEq, Eq, Hash, Debug, Copy, Clone)]
     pub struct StatusEffects: u16 {
         /// The unit's movement is increased by 1 and attack is increased by 0.5.
         const BOOSTED = 0b00000001;
@@ -94,6 +94,22 @@ bitflags::bitflags! {
         /// The unit's defense is increased by 300%.
         const WALLED = 0b00000010_00000000;
     }
+}
+
+fn trait_effects(traits: Traits) -> StatusEffects {
+    let mut effects = StatusEffects::empty();
+
+    if traits.contains(Traits::POISON) {
+        effects.insert(StatusEffects::POISONED);
+    }
+    if traits.contains(Traits::FREEZE) {
+        effects.insert(StatusEffects::FROZEN);
+    }
+    if traits.contains(Traits::CONVERT) {
+        effects.insert(StatusEffects::CONVERTED);
+    }
+
+    effects
 }
 
 pub struct UnitTypeData {
@@ -148,9 +164,10 @@ pub enum UnitType {
 }
 
 pub struct Unit {
-    unit_type: UnitType,
+    pub unit_type: UnitType,
     pub current_hp: f32,
     pub status_effects: StatusEffects,
+    pub trait_effects: StatusEffects,
 }
 
 impl Unit {
@@ -163,6 +180,7 @@ impl Unit {
             unit_type,
             current_hp: current_hp.unwrap_or(generated::UNIT_TYPE_DATA[unit_type as usize].max_hp),
             status_effects: status_effects.unwrap_or(StatusEffects::empty()),
+            trait_effects: trait_effects(generated::UNIT_TYPE_DATA[unit_type as usize].traits),
         }
     }
 
@@ -206,6 +224,7 @@ impl Unit {
         self.current_hp / self.max_hp()
     }
 
+    #[inline]
     pub fn defense_bonus(&self) -> f32 {
         if self.status_effects.contains(StatusEffects::POISONED) {
             0.7
@@ -218,146 +237,182 @@ impl Unit {
         }
     }
 
+    #[inline]
     pub fn archer() -> Self {
         Unit::new(UnitType::Archer, None, None)
     }
 
+    #[inline]
     pub fn baby_dragon() -> Self {
         Unit::new(UnitType::BabyDragon, None, None)
     }
 
+    #[inline]
     pub fn battle_sled() -> Self {
         Unit::new(UnitType::BattleSled, None, None)
     }
 
+    #[inline]
     pub fn catapult() -> Self {
         Unit::new(UnitType::Catapult, None, None)
     }
 
+    #[inline]
     pub fn centipede() -> Self {
         Unit::new(UnitType::Centipede, None, None)
     }
 
+    #[inline]
     pub fn cloak() -> Self {
         Unit::new(UnitType::Cloak, None, None)
     }
 
+    #[inline]
     pub fn crab() -> Self {
         Unit::new(UnitType::Crab, None, None)
     }
 
+    #[inline]
     pub fn dagger() -> Self {
         Unit::new(UnitType::Dagger, None, None)
     }
 
+    #[inline]
     pub fn defender() -> Self {
         Unit::new(UnitType::Defender, None, None)
     }
 
+    #[inline]
     pub fn doomux() -> Self {
         Unit::new(UnitType::Doomux, None, None)
     }
 
+    #[inline]
     pub fn egg() -> Self {
         Unit::new(UnitType::Egg, None, None)
     }
 
+    #[inline]
     pub fn exida() -> Self {
         Unit::new(UnitType::Exida, None, None)
     }
 
+    #[inline]
     pub fn fire_dragon() -> Self {
         Unit::new(UnitType::FireDragon, None, None)
     }
 
+    #[inline]
     pub fn gaami() -> Self {
         Unit::new(UnitType::Gaami, None, None)
     }
 
+    #[inline]
     pub fn giant() -> Self {
         Unit::new(UnitType::Giant, None, None)
     }
 
+    #[inline]
     pub fn hexapod() -> Self {
         Unit::new(UnitType::Hexapod, None, None)
     }
 
+    #[inline]
     pub fn ice_archer() -> Self {
         Unit::new(UnitType::IceArcher, None, None)
     }
 
+    #[inline]
     pub fn ice_fortress() -> Self {
         Unit::new(UnitType::IceFortress, None, None)
     }
 
+    #[inline]
     pub fn jelly() -> Self {
         Unit::new(UnitType::Jelly, None, None)
     }
 
+    #[inline]
     pub fn juggernaut() -> Self {
         Unit::new(UnitType::Juggernaut, None, None)
     }
 
+    #[inline]
     pub fn kiton() -> Self {
         Unit::new(UnitType::Kiton, None, None)
     }
 
+    #[inline]
     pub fn knight() -> Self {
         Unit::new(UnitType::Knight, None, None)
     }
 
+    #[inline]
     pub fn mind_bender() -> Self {
         Unit::new(UnitType::MindBender, None, None)
     }
 
+    #[inline]
     pub fn mooni() -> Self {
         Unit::new(UnitType::Mooni, None, None)
     }
 
+    #[inline]
     pub fn phychi() -> Self {
         Unit::new(UnitType::Phychi, None, None)
     }
 
+    #[inline]
     pub fn pirate() -> Self {
         Unit::new(UnitType::Pirate, None, None)
     }
 
+    #[inline]
     pub fn polytaur() -> Self {
         Unit::new(UnitType::Polytaur, None, None)
     }
 
+    #[inline]
     pub fn puffer() -> Self {
         Unit::new(UnitType::Puffer, None, None)
     }
 
+    #[inline]
     pub fn raychi() -> Self {
         Unit::new(UnitType::Raychi, None, None)
     }
 
+    #[inline]
     pub fn rider() -> Self {
         Unit::new(UnitType::Rider, None, None)
     }
 
+    #[inline]
     pub fn segment() -> Self {
         Unit::new(UnitType::Segment, None, None)
     }
 
+    #[inline]
     pub fn shaman() -> Self {
         Unit::new(UnitType::Shaman, None, None)
     }
 
+    #[inline]
     pub fn shark() -> Self {
         Unit::new(UnitType::Shark, None, None)
     }
 
+    #[inline]
     pub fn swordsman() -> Self {
         Unit::new(UnitType::Swordsman, None, None)
     }
 
+    #[inline]
     pub fn tridention() -> Self {
         Unit::new(UnitType::Tridention, None, None)
     }
 
+    #[inline]
     pub fn warrior() -> Self {
         Unit::new(UnitType::Warrior, None, None)
     }
@@ -369,6 +424,394 @@ impl Default for Unit {
             unit_type: UnitType::DefaultWarrior,
             current_hp: 10.0,
             status_effects: StatusEffects::empty(),
+            trait_effects: StatusEffects::empty(),
         }
+    }
+}
+
+pub struct NavalTypeData {
+    pub name: &'static str,
+    pub cost: u8,
+    pub attack: f32,
+    pub defense: f32,
+    pub range: u8,
+    pub traits: Traits,
+}
+
+#[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
+pub enum NavalType {
+    Bomber,
+    Raft,
+    Rammer,
+    Scout,
+}
+
+pub struct NavalUnit {
+    pub naval_type: NavalType,
+    pub inner: Unit,
+}
+
+impl NavalUnit {
+    pub fn new(naval_type: NavalType, unit: Unit) -> Self {
+        NavalUnit {
+            naval_type,
+            inner: unit,
+        }
+    }
+
+    #[inline]
+    pub fn attack(&self) -> f32 {
+        generated::NAVAL_TYPE_DATA[self.naval_type as usize].attack
+    }
+
+    #[inline]
+    pub fn cost(&self) -> u8 {
+        generated::NAVAL_TYPE_DATA[self.naval_type as usize].cost + self.inner.cost()
+    }
+
+    #[inline]
+    pub fn defense(&self) -> f32 {
+        generated::NAVAL_TYPE_DATA[self.naval_type as usize].defense
+    }
+
+    #[inline]
+    pub fn max_hp(&self) -> f32 {
+        self.inner.max_hp()
+    }
+
+    #[inline]
+    pub fn name(&self) -> &'static str {
+        generated::NAVAL_TYPE_DATA[self.naval_type as usize].name
+    }
+
+    #[inline]
+    pub fn range(&self) -> u8 {
+        generated::NAVAL_TYPE_DATA[self.naval_type as usize].range
+    }
+
+    #[inline]
+    pub fn traits(&self) -> Traits {
+        generated::NAVAL_TYPE_DATA[self.naval_type as usize].traits
+    }
+
+    #[inline]
+    pub fn health_ratio(&self) -> f32 {
+        self.inner.health_ratio()
+    }
+
+    #[inline]
+    pub fn defense_bonus(&self) -> f32 {
+        self.inner.defense_bonus()
+    }
+
+    #[inline]
+    pub fn bomber(unit: Option<Unit>) -> Self {
+        NavalUnit::new(NavalType::Bomber, unit.unwrap_or_default())
+    }
+
+    #[inline]
+    pub fn raft(unit: Option<Unit>) -> Self {
+        NavalUnit::new(NavalType::Raft, unit.unwrap_or_default())
+    }
+
+    #[inline]
+    pub fn rammer(unit: Option<Unit>) -> Self {
+        NavalUnit::new(NavalType::Rammer, unit.unwrap_or_default())
+    }
+
+    #[inline]
+    pub fn scout(unit: Option<Unit>) -> Self {
+        NavalUnit::new(NavalType::Scout, unit.unwrap_or_default())
+    }
+}
+
+pub enum UnitKind {
+    Regular(Unit),
+    Naval(NavalUnit),
+}
+
+impl UnitKind {
+    pub fn attack(&self) -> f32 {
+        match self {
+            UnitKind::Regular(unit) => unit.attack(),
+            UnitKind::Naval(unit) => unit.attack(),
+        }
+    }
+
+    pub fn cost(&self) -> u8 {
+        match self {
+            UnitKind::Regular(unit) => unit.cost(),
+            UnitKind::Naval(unit) => unit.cost(),
+        }
+    }
+
+    pub fn defense(&self) -> f32 {
+        match self {
+            UnitKind::Regular(unit) => unit.defense(),
+            UnitKind::Naval(unit) => unit.defense(),
+        }
+    }
+
+    pub fn max_hp(&self) -> f32 {
+        match self {
+            UnitKind::Regular(unit) => unit.max_hp(),
+            UnitKind::Naval(unit) => unit.max_hp(),
+        }
+    }
+
+    pub fn name(&self) -> &'static str {
+        match self {
+            UnitKind::Regular(unit) => unit.name(),
+            UnitKind::Naval(unit) => unit.name(),
+        }
+    }
+
+    pub fn range(&self) -> u8 {
+        match self {
+            UnitKind::Regular(unit) => unit.range(),
+            UnitKind::Naval(unit) => unit.range(),
+        }
+    }
+
+    pub fn traits(&self) -> Traits {
+        match self {
+            UnitKind::Regular(unit) => unit.traits(),
+            UnitKind::Naval(unit) => unit.traits(),
+        }
+    }
+
+    pub fn health_ratio(&self) -> f32 {
+        match self {
+            UnitKind::Regular(unit) => unit.health_ratio(),
+            UnitKind::Naval(unit) => unit.health_ratio(),
+        }
+    }
+
+    pub fn defense_bonus(&self) -> f32 {
+        match self {
+            UnitKind::Regular(unit) => unit.defense_bonus(),
+            UnitKind::Naval(unit) => unit.defense_bonus(),
+        }
+    }
+
+    pub fn status_effects(&self) -> StatusEffects {
+        match self {
+            UnitKind::Regular(unit) => unit.status_effects,
+            UnitKind::Naval(unit) => unit.inner.status_effects,
+        }
+    }
+
+    pub fn current_hp(&self) -> f32 {
+        match self {
+            UnitKind::Regular(unit) => unit.current_hp,
+            UnitKind::Naval(unit) => unit.inner.current_hp,
+        }
+    }
+
+    pub fn trait_effects(&self) -> StatusEffects {
+        match self {
+            UnitKind::Regular(unit) => unit.trait_effects,
+            UnitKind::Naval(_) => StatusEffects::empty(),
+        }
+    }
+
+    #[inline]
+    pub fn archer() -> Self {
+        UnitKind::Regular(Unit::archer())
+    }
+
+    #[inline]
+    pub fn baby_dragon() -> Self {
+        UnitKind::Regular(Unit::baby_dragon())
+    }
+
+    #[inline]
+    pub fn battle_sled() -> Self {
+        UnitKind::Regular(Unit::battle_sled())
+    }
+
+    #[inline]
+    pub fn catapult() -> Self {
+        UnitKind::Regular(Unit::catapult())
+    }
+
+    #[inline]
+    pub fn centipede() -> Self {
+        UnitKind::Regular(Unit::centipede())
+    }
+
+    #[inline]
+    pub fn cloak() -> Self {
+        UnitKind::Regular(Unit::cloak())
+    }
+
+    #[inline]
+    pub fn crab() -> Self {
+        UnitKind::Regular(Unit::crab())
+    }
+
+    #[inline]
+    pub fn dagger() -> Self {
+        UnitKind::Regular(Unit::dagger())
+    }
+
+    #[inline]
+    pub fn defender() -> Self {
+        UnitKind::Regular(Unit::defender())
+    }
+
+    #[inline]
+    pub fn doomux() -> Self {
+        UnitKind::Regular(Unit::doomux())
+    }
+
+    #[inline]
+    pub fn egg() -> Self {
+        UnitKind::Regular(Unit::egg())
+    }
+
+    #[inline]
+    pub fn exida() -> Self {
+        UnitKind::Regular(Unit::exida())
+    }
+
+    #[inline]
+    pub fn fire_dragon() -> Self {
+        UnitKind::Regular(Unit::fire_dragon())
+    }
+
+    #[inline]
+    pub fn gaami() -> Self {
+        UnitKind::Regular(Unit::gaami())
+    }
+
+    #[inline]
+    pub fn giant() -> Self {
+        UnitKind::Regular(Unit::giant())
+    }
+
+    #[inline]
+    pub fn hexapod() -> Self {
+        UnitKind::Regular(Unit::hexapod())
+    }
+
+    #[inline]
+    pub fn ice_archer() -> Self {
+        UnitKind::Regular(Unit::ice_archer())
+    }
+
+    #[inline]
+    pub fn ice_fortress() -> Self {
+        UnitKind::Regular(Unit::ice_fortress())
+    }
+
+    #[inline]
+    pub fn jelly() -> Self {
+        UnitKind::Regular(Unit::jelly())
+    }
+
+    #[inline]
+    pub fn juggernaut() -> Self {
+        UnitKind::Regular(Unit::juggernaut())
+    }
+
+    #[inline]
+    pub fn kiton() -> Self {
+        UnitKind::Regular(Unit::kiton())
+    }
+
+    #[inline]
+    pub fn knight() -> Self {
+        UnitKind::Regular(Unit::knight())
+    }
+
+    #[inline]
+    pub fn mind_bender() -> Self {
+        UnitKind::Regular(Unit::mind_bender())
+    }
+
+    #[inline]
+    pub fn mooni() -> Self {
+        UnitKind::Regular(Unit::mooni())
+    }
+
+    #[inline]
+    pub fn phychi() -> Self {
+        UnitKind::Regular(Unit::phychi())
+    }
+
+    #[inline]
+    pub fn pirate() -> Self {
+        UnitKind::Regular(Unit::pirate())
+    }
+
+    #[inline]
+    pub fn polytaur() -> Self {
+        UnitKind::Regular(Unit::polytaur())
+    }
+
+    #[inline]
+    pub fn puffer() -> Self {
+        UnitKind::Regular(Unit::puffer())
+    }
+
+    #[inline]
+    pub fn raychi() -> Self {
+        UnitKind::Regular(Unit::raychi())
+    }
+
+    #[inline]
+    pub fn rider() -> Self {
+        UnitKind::Regular(Unit::rider())
+    }
+
+    #[inline]
+    pub fn segment() -> Self {
+        UnitKind::Regular(Unit::segment())
+    }
+
+    #[inline]
+    pub fn shaman() -> Self {
+        UnitKind::Regular(Unit::shaman())
+    }
+
+    #[inline]
+    pub fn shark() -> Self {
+        UnitKind::Regular(Unit::shark())
+    }
+
+    #[inline]
+    pub fn swordsman() -> Self {
+        UnitKind::Regular(Unit::swordsman())
+    }
+
+    #[inline]
+    pub fn tridention() -> Self {
+        UnitKind::Regular(Unit::tridention())
+    }
+
+    #[inline]
+    pub fn warrior() -> Self {
+        UnitKind::Regular(Unit::warrior())
+    }
+
+    #[inline]
+    pub fn bomber(unit: Option<Unit>) -> Self {
+        UnitKind::Naval(NavalUnit::bomber(unit))
+    }
+
+    #[inline]
+    pub fn raft(unit: Option<Unit>) -> Self {
+        UnitKind::Naval(NavalUnit::raft(unit))
+    }
+
+    #[inline]
+    pub fn rammer(unit: Option<Unit>) -> Self {
+        UnitKind::Naval(NavalUnit::rammer(unit))
+    }
+
+    #[inline]
+    pub fn scout(unit: Option<Unit>) -> Self {
+        UnitKind::Naval(NavalUnit::scout(unit))
     }
 }

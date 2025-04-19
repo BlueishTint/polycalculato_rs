@@ -5,8 +5,16 @@ pub fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("wa ar", |b| {
         b.iter(|| {
             combat::single_combat(
-                black_box(&unit::Unit::warrior()),
-                black_box(&unit::Unit::archer()),
+                black_box(&unit::UnitKind::warrior()),
+                black_box(&unit::UnitKind::archer()),
+            )
+        });
+    });
+    c.bench_function("wa rf", |b| {
+        b.iter(|| {
+            combat::single_combat(
+                black_box(&unit::UnitKind::warrior()),
+                black_box(&unit::UnitKind::raft(None)),
             )
         });
     });

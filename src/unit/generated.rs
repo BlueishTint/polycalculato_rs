@@ -1,5 +1,5 @@
 // AUTO-GENERATED FILE, DO NOT EDIT
-use crate::unit::{UnitTypeData, Traits};
+use crate::unit::{UnitTypeData, NavalTypeData, Traits};
 
 pub static UNIT_TYPE_DATA: &[UnitTypeData] = &[
     UnitTypeData { name: "Archer", cost: 3, max_hp: 10.0, attack: 2.0, defense: 1.0, range: 2, traits: Traits::DASH.union(Traits::FORTIFY) },
@@ -39,4 +39,11 @@ pub static UNIT_TYPE_DATA: &[UnitTypeData] = &[
     UnitTypeData { name: "Swordsman", cost: 5, max_hp: 15.0, attack: 3.0, defense: 3.0, range: 1, traits: Traits::DASH },
     UnitTypeData { name: "Tridention", cost: 8, max_hp: 10.0, attack: 2.5, defense: 1.0, range: 2, traits: Traits::DASH.union(Traits::PERSIST) },
     UnitTypeData { name: "Warrior", cost: 2, max_hp: 10.0, attack: 2.0, defense: 2.0, range: 1, traits: Traits::DASH.union(Traits::FORTIFY) },
+];
+
+pub static NAVAL_TYPE_DATA: &[NavalTypeData] = &[
+    NavalTypeData { name: "Bomber", cost: 15, attack: 3.0, defense: 2.0, range: 3, traits: Traits::CARRY.union(Traits::SPLASH).union(Traits::STATIC).union(Traits::STIFF) },
+    NavalTypeData { name: "Raft", cost: 0, attack: 0.0, defense: 2.0, range: 0, traits: Traits::CARRY.union(Traits::STATIC).union(Traits::STIFF) },
+    NavalTypeData { name: "Rammer", cost: 5, attack: 3.0, defense: 3.0, range: 1, traits: Traits::CARRY.union(Traits::DASH).union(Traits::STATIC) },
+    NavalTypeData { name: "Scout", cost: 5, attack: 2.0, defense: 1.0, range: 2, traits: Traits::CARRY.union(Traits::DASH).union(Traits::SCOUT).union(Traits::STATIC) },
 ];

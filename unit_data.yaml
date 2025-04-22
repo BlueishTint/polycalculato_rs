@@ -4,363 +4,330 @@ Archer:
   defense: 1
   hp: 10
   range: 2
-  traits:
-  - dash
-  - fortify
+  retaliates: true
+  surprise: false
+  trait_effects: null
 BabyDragon:
   attack: 3
   cost: 10
   defense: 3
   hp: 15
   range: 1
-  traits:
-  - dash
-  - escape
-  - grow
-  - scout
-  - static
+  retaliates: true
+  surprise: false
+  trait_effects: null
 BattleSled:
   attack: 3
   cost: 5
   defense: 2
   hp: 15
   range: 1
-  traits:
-  - dash
-  - escape
-  - skate
+  retaliates: true
+  surprise: false
+  trait_effects: null
 Catapult:
   attack: 4
   cost: 8
   defense: 0
   hp: 10
   range: 3
-  traits:
-  - stiff
+  retaliates: false
+  surprise: false
+  trait_effects: null
 Centipede:
   attack: 4
   cost: 10
   defense: 3
   hp: 20
   range: 1
-  traits:
-  - creep
-  - dash
-  - eat
-  - static
+  retaliates: true
+  surprise: false
+  trait_effects: null
 Cloak:
   attack: 2
   cost: 8
   defense: 0.5
   hp: 5
   range: 1
-  traits:
-  - creep
-  - dash
-  - hide
-  - infiltrate
-  - scout
-  - static
-  - stiff
+  retaliates: false
+  surprise: false
+  trait_effects: null
 Crab:
   attack: 4
   cost: 10
   defense: 4
   hp: 40
   range: 1
-  traits:
-  - autoflood
-  - escape
-  - static
+  retaliates: false
+  surprise: false
+  trait_effects: null
 Dagger:
   attack: 2
   cost: 2
   defense: 2
   hp: 10
   range: 1
-  traits:
-  - dash
-  - independent
-  - static
-  - surprise
+  retaliates: true
+  surprise: true
+  trait_effects: null
 DefaultWarrior:
   attack: 2
   cost: 2
   defense: 2
   hp: 10
   range: 1
-  traits:
-  - dash
-  - fortify
+  retaliates: true
+  surprise: false
+  trait_effects: null
 Defender:
   attack: 1
   cost: 3
   defense: 3
   hp: 15
   range: 1
-  traits:
-  - fortify
+  retaliates: true
+  surprise: false
+  trait_effects: null
 Doomux:
   attack: 4
   cost: 10
   defense: 2
   hp: 20
   range: 1
-  traits:
-  - creep
-  - dash
-  - explode
+  retaliates: true
+  surprise: false
+  trait_effects: null
 Egg:
   attack: 0
   cost: 10
   defense: 2
   hp: 10
   range: 1
-  traits:
-  - fortify
-  - grow
-  - static
-  - stiff
+  retaliates: false
+  surprise: false
+  trait_effects: null
 Exida:
   attack: 3
   cost: 8
   defense: 1
   hp: 10
   range: 3
-  traits:
-  - poison
+  retaliates: true
+  surprise: false
+  trait_effects: POISONED
 FireDragon:
   attack: 4
   cost: 10
   defense: 3
   hp: 20
   range: 2
-  traits:
-  - dash
-  - scout
-  - splash
-  - static
+  retaliates: true
+  surprise: false
+  trait_effects: null
 Gaami:
   attack: 4
   cost: 10
   defense: 3
   hp: 30
   range: 1
-  traits:
-  - auto_freeze
-  - freeze_area
-  - static
+  retaliates: true
+  surprise: false
+  trait_effects: null
 Giant:
   attack: 5
   cost: 10
   defense: 4
   hp: 40
   range: 1
-  traits:
-  - static
+  retaliates: true
+  surprise: false
+  trait_effects: null
 Hexapod:
   attack: 3
   cost: 3
   defense: 1
   hp: 5
   range: 1
-  traits:
-  - creep
-  - dash
-  - escape
-  - sneak
+  retaliates: true
+  surprise: false
+  trait_effects: null
 IceArcher:
   attack: 0
   cost: 3
   defense: 1
   hp: 10
   range: 2
-  traits:
-  - dash
-  - fortify
-  - freeze
-  - stiff
+  retaliates: false
+  surprise: false
+  trait_effects: FROZEN
 IceFortress:
   attack: 4
   cost: 15
   defense: 3
   hp: 20
   range: 2
-  traits:
-  - scout
-  - skate
+  retaliates: true
+  surprise: false
+  trait_effects: null
 Jelly:
   attack: 2
   cost: 8
   defense: 2
   hp: 20
   range: 1
-  traits:
-  - static
-  - stiff
-  - tentacles
+  retaliates: false
+  surprise: false
+  trait_effects: null
 Juggernaut:
   attack: 4
   cost: 10
   defense: 4
   hp: 40
   range: 1
-  traits:
-  - carry
-  - static
-  - stiff
-  - stomp
+  retaliates: false
+  surprise: false
+  trait_effects: null
 Kiton:
   attack: 1
   cost: 3
   defense: 3
   hp: 15
   range: 1
-  traits:
-  - poison
+  retaliates: true
+  surprise: false
+  trait_effects: POISONED
 Knight:
   attack: 3.5
   cost: 8
   defense: 1
   hp: 10
   range: 1
-  traits:
-  - dash
-  - persist
+  retaliates: true
+  surprise: false
+  trait_effects: null
 MindBender:
   attack: 0
   cost: 5
   defense: 1
   hp: 10
   range: 1
-  traits:
-  - convert
-  - heal
-  - stiff
+  retaliates: false
+  surprise: false
+  trait_effects: CONVERTED
 Mooni:
   attack: 0
   cost: 5
   defense: 1
   hp: 10
   range: 1
-  traits:
-  - auto_freeze
-  - skate
-  - static
-  - stiff
+  retaliates: false
+  surprise: false
+  trait_effects: null
 Phychi:
   attack: 1
   cost: 3
   defense: 1
   hp: 5
   range: 2
-  traits:
-  - dash
-  - poison
-  - surprise
+  retaliates: true
+  surprise: true
+  trait_effects: POISONED
 Pirate:
   attack: 2
   cost: 2
   defense: 1
   hp: 10
   range: 1
-  traits:
-  - dash
-  - independent
-  - static
-  - surprise
+  retaliates: true
+  surprise: true
+  trait_effects: null
 Polytaur:
   attack: 3
   cost: 3
   defense: 1
   hp: 15
   range: 1
-  traits:
-  - dash
-  - fortify
-  - independent
-  - static
+  retaliates: true
+  surprise: false
+  trait_effects: null
 Puffer:
   attack: 4
   cost: 8
   defense: 0
   hp: 10
   range: 3
-  traits:
-  - drench
+  retaliates: true
+  surprise: false
+  trait_effects: null
 Raychi:
   attack: 3
   cost: 8
   defense: 2
   hp: 15
   range: 1
-  traits:
-  - creep
-  - dash
-  - explode
-  - navigate
+  retaliates: true
+  surprise: false
+  trait_effects: null
 Rider:
   attack: 2
   cost: 3
   defense: 1
   hp: 10
   range: 1
-  traits:
-  - dash
-  - escape
-  - fortify
+  retaliates: true
+  surprise: false
+  trait_effects: null
 Segment:
   attack: 2
   cost: 1
   defense: 1.5
-  hp: 5
+  hp: 10
   range: 1
-  traits:
-  - explode
-  - static
-  - stiff
+  retaliates: false
+  surprise: false
+  trait_effects: null
 Shaman:
   attack: 1
   cost: 5
   defense: 1
   hp: 10
   range: 1
-  traits:
-  - boost
-  - convert
-  - static
+  retaliates: true
+  surprise: false
+  trait_effects: CONVERTED
 Shark:
   attack: 3.5
   cost: 8
   defense: 2
   hp: 10
   range: 1
-  traits:
-  - dash
-  - surprise
+  retaliates: true
+  surprise: true
+  trait_effects: null
 Swordsman:
   attack: 3
   cost: 5
   defense: 3
   hp: 15
   range: 1
-  traits:
-  - dash
+  retaliates: true
+  surprise: false
+  trait_effects: null
 Tridention:
   attack: 2.5
   cost: 8
   defense: 1
   hp: 10
   range: 2
-  traits:
-  - dash
-  - persist
+  retaliates: true
+  surprise: false
+  trait_effects: null
 Warrior:
   attack: 2
   cost: 2
   defense: 2
   hp: 10
   range: 1
-  traits:
-  - dash
-  - fortify
+  retaliates: true
+  surprise: false
+  trait_effects: null

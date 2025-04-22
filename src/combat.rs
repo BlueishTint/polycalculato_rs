@@ -1,4 +1,4 @@
-use crate::unit::{StatusEffects, Traits, UnitKind};
+use crate::unit::{StatusEffects, Unit};
 
 fn calculate_damage(
     attack: f32,
@@ -7,22 +7,22 @@ fn calculate_damage(
     defender_health_ratio: f32,
     defense_bonus: f32,
     halved: bool,
-) -> [f32; 2] {
+) -> (f32, f32) {
     let attack_force = attack * attacker_health_ratio;
     let defense_force = defense * defender_health_ratio * defense_bonus;
     let total_damage = attack_force + defense_force;
 
     if total_damage == 0.0 {
-        return [0.0, 0.0];
+        return (0.0, 0.0);
     }
 
     let to_defender = (attack_force / total_damage * attack * 4.5).round();
     let to_attacker = (defense_force / total_damage * defense * 4.5).round();
 
     if halved {
-        [to_attacker / 2.0, to_defender / 2.0]
+        (to_attacker / 2.0, to_defender / 2.0)
     } else {
-        [to_attacker, to_defender]
+        (to_attacker, to_defender)
     }
 }
 
@@ -46,93 +46,73 @@ fn calculate_attacker_damage(
     to_defender
 }
 
-fn calculate_status_effects(
-    attacker_traits: Traits,
-    defender_traits: Traits,
-) -> [StatusEffects; 2] {
-    let mut to_attacker = StatusEffects::empty();
-    let mut to_defender = StatusEffects::empty();
-
-    if attacker_traits.contains(Traits::POISON) {
-        to_defender.insert(StatusEffects::POISONED);
-    }
-    if attacker_traits.contains(Traits::CONVERT) {
-        to_defender.insert(StatusEffects::CONVERTED);
-    }
-    if attacker_traits.contains(Traits::FREEZE) {
-        to_defender.insert(StatusEffects::FROZEN);
-    }
-    if defender_traits.contains(Traits::POISON) {
-        to_attacker.insert(StatusEffects::POISONED);
-    }
-
-    [to_attacker, to_defender]
-}
-
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct UnitResult {
     pub damage: f32,
     pub status_effects: StatusEffects,
 }
 
-pub fn single_combat(attacker: &UnitKind, defender: &UnitKind) -> (UnitResult, UnitResult) {
-    let attacker_traits = attacker.traits();
-    let defender_traits = defender.traits();
+#[inline]
+fn is_jelly(unit: &Unit) -> bool {
+    !unit.retaliates && unit.max_hp == 20.0
+}
 
+pub fn single_combat(attacker: &Unit, defender: &Unit) -> (UnitResult, UnitResult) {
     let mut tentacle_damage = 0f32;
     let mut takes_retaliation = false;
 
-    if defender_traits.contains(Traits::TENTACLES) {
-        if attacker_traits.contains(Traits::TENTACLES) {
+    if is_jelly(defender) {
+        if is_jelly(attacker) {
             takes_retaliation = true;
-        } else if attacker.range() <= defender.range() {
+        } else if attacker.range <= defender.range {
             tentacle_damage = calculate_attacker_damage(
-                defender.attack(),
-                attacker.defense(),
-                defender.health_ratio(),
-                attacker.health_ratio(),
-                attacker.defense_bonus(),
+                defender.attack,
+                attacker.defense,
+                defender.current_hp / defender.max_hp,
+                attacker.current_hp / attacker.max_hp,
+                attacker.defense_bonus,
             );
         }
     }
 
-    let [damage_to_attacker, damage_to_defender] = calculate_damage(
-        attacker.attack(),
-        defender.defense(),
-        (attacker.current_hp() - tentacle_damage) / attacker.max_hp(),
-        defender.health_ratio(),
-        defender.defense_bonus(),
+    let (damage_to_attacker, damage_to_defender) = calculate_damage(
+        attacker.attack,
+        defender.defense,
+        (attacker.current_hp - tentacle_damage) / attacker.max_hp,
+        defender.current_hp / defender.max_hp,
+        defender.defense_bonus,
         attacker
-            .status_effects()
+            .status_effects
             .contains(StatusEffects::SPLASHING | StatusEffects::EXPLODING),
     );
 
+    let effects_to_defender = attacker.trait_effects;
+
     takes_retaliation = takes_retaliation
         || attacker
-            .status_effects()
+            .status_effects
             .contains(StatusEffects::TAKES_RETALIATION)
-        || !(attacker.range() > defender.range()
-            || (defender.current_hp() - damage_to_defender) <= 0.0
-            || defender_traits.contains(Traits::STIFF)
-            || attacker_traits.contains(Traits::SURPRISE)
-            || attacker_traits.contains(Traits::CONVERT)
-            || attacker_traits.contains(Traits::FREEZE)
-            || defender.status_effects().contains(StatusEffects::FROZEN));
+        || !(attacker.range > defender.range
+            || (defender.current_hp - damage_to_defender) <= 0.0
+            || !defender.retaliates
+            || attacker.surprise
+            || effects_to_defender.contains(StatusEffects::FROZEN)
+            || effects_to_defender.contains(StatusEffects::CONVERTED)
+            || defender.status_effects.contains(StatusEffects::FROZEN));
 
-    let [effects_to_attacker, effects_to_defender] =
-        calculate_status_effects(attacker_traits, defender_traits);
+    let effects_to_attacker = defender.trait_effects;
 
-    let exploding = attacker.status_effects().contains(StatusEffects::EXPLODING);
+    let exploding = attacker.status_effects.contains(StatusEffects::EXPLODING);
 
     // Premature optimization to avoid branches
     //
     // let total_damage_to_attacker = (damage_to_attacker * f32::from(takes_retaliation)
     //     + tentacle_damage)
     //     * f32::from(!exploding)
-    //     + f32::from(exploding) * attacker.max_hp();
+    //     + f32::from(exploding) * attacker.max_hp;
 
     let total_damage_to_attacker = if exploding {
-        attacker.max_hp()
+        attacker.max_hp
     } else if takes_retaliation {
         damage_to_attacker + tentacle_damage
     } else {
@@ -161,12 +141,14 @@ pub fn single_combat(attacker: &UnitKind, defender: &UnitKind) -> (UnitResult, U
 
 #[cfg(test)]
 mod tests {
+    use crate::unit::UnitType;
+
     use super::*;
 
     #[test]
     fn test_wa_wa() {
-        let attacker = UnitKind::warrior();
-        let defender = UnitKind::warrior();
+        let attacker = Unit::new(UnitType::Warrior);
+        let defender = Unit::new(UnitType::Warrior);
 
         let (attacker_result, defender_result) = single_combat(&attacker, &defender);
 
@@ -178,12 +160,8 @@ mod tests {
 
     #[test]
     fn test_wa_wa_d() {
-        let attacker = UnitKind::warrior();
-        let defender = UnitKind::Regular(crate::unit::Unit::new(
-            crate::unit::UnitType::Warrior,
-            None,
-            Some(StatusEffects::FORTIFIED),
-        ));
+        let attacker = Unit::new(UnitType::Warrior);
+        let defender = Unit::new(UnitType::Warrior).with_status_effects(StatusEffects::FORTIFIED);
 
         let (attacker_result, defender_result) = single_combat(&attacker, &defender);
 
@@ -195,8 +173,8 @@ mod tests {
 
     #[test]
     fn test_wa_je() {
-        let attacker = UnitKind::warrior();
-        let defender = UnitKind::jelly();
+        let attacker = Unit::new(UnitType::Warrior);
+        let defender = Unit::new(UnitType::Jelly);
 
         let (attacker_result, defender_result) = single_combat(&attacker, &defender);
 
@@ -208,8 +186,8 @@ mod tests {
 
     #[test]
     fn test_je_wa() {
-        let attacker = UnitKind::jelly();
-        let defender = UnitKind::warrior();
+        let attacker = Unit::new(UnitType::Jelly);
+        let defender = Unit::new(UnitType::Warrior);
 
         let (attacker_result, defender_result) = single_combat(&attacker, &defender);
 

@@ -1,6 +1,6 @@
 use crate::unit::{StatusEffects, Unit};
 
-const eps: f32 = 1e-6;
+const ELIPSON: f32 = 1e-6;
 
 fn calculate_damage(
     attack: f32,
@@ -18,8 +18,8 @@ fn calculate_damage(
         return (0.0, 0.0);
     }
 
-    let to_defender = (attack_force / total_damage * attack * 4.5 + eps).round();
-    let to_attacker = (defense_force / total_damage * defense * 4.5 + eps).round();
+    let to_defender = (attack_force / total_damage * attack * 4.5 + ELIPSON).round();
+    let to_attacker = (defense_force / total_damage * defense * 4.5 + ELIPSON).round();
 
     if halved {
         (to_attacker / 2.0, to_defender / 2.0)
@@ -43,7 +43,7 @@ fn calculate_attacker_damage(
         return 0.0;
     }
 
-    let to_defender = (attack_force / total_damage * attack * 4.5 + eps).round();
+    let to_defender = (attack_force / total_damage * attack * 4.5 + ELIPSON).round();
 
     to_defender
 }

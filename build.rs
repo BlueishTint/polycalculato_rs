@@ -5,6 +5,10 @@ use serde::Deserialize;
 #[derive(Deserialize)]
 struct RawUnitData {
     attack: f32,
+    #[allow(
+        unused,
+        reason = "cost is not currently used, but is in the unit_data file"
+    )]
     cost: u8,
     defense: f32,
     hp: f32,

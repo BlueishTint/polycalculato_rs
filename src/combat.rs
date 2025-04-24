@@ -1,5 +1,7 @@
 use crate::unit::{StatusEffects, Unit};
 
+const eps: f32 = 1e-6;
+
 fn calculate_damage(
     attack: f32,
     defense: f32,
@@ -16,8 +18,8 @@ fn calculate_damage(
         return (0.0, 0.0);
     }
 
-    let to_defender = (attack_force / total_damage * attack * 4.5).round();
-    let to_attacker = (defense_force / total_damage * defense * 4.5).round();
+    let to_defender = (attack_force / total_damage * attack * 4.5 + eps).round();
+    let to_attacker = (defense_force / total_damage * defense * 4.5 + eps).round();
 
     if halved {
         (to_attacker / 2.0, to_defender / 2.0)
@@ -41,7 +43,7 @@ fn calculate_attacker_damage(
         return 0.0;
     }
 
-    let to_defender = (attack_force / total_damage * attack * 4.5).round();
+    let to_defender = (attack_force / total_damage * attack * 4.5 + eps).round();
 
     to_defender
 }
@@ -58,13 +60,15 @@ fn is_jelly(unit: &Unit) -> bool {
 }
 
 pub fn single_combat(attacker: &Unit, defender: &Unit) -> (UnitResult, UnitResult) {
-    let mut tentacle_damage = 0f32;
+    let mut tentacle_damage = 0.0;
     let mut takes_retaliation = false;
+
+    let defender_in_range = defender.range >= attacker.range;
 
     if is_jelly(defender) {
         if is_jelly(attacker) {
             takes_retaliation = true;
-        } else if attacker.range <= defender.range {
+        } else if defender_in_range {
             tentacle_damage = calculate_attacker_damage(
                 defender.attack,
                 attacker.defense,
@@ -92,7 +96,7 @@ pub fn single_combat(attacker: &Unit, defender: &Unit) -> (UnitResult, UnitResul
         || attacker
             .status_effects
             .contains(StatusEffects::TAKES_RETALIATION)
-        || !(attacker.range > defender.range
+        || !(!defender_in_range
             || (defender.current_hp - damage_to_defender) <= 0.0
             || !defender.retaliates
             || attacker.surprise
@@ -137,6 +141,58 @@ pub fn single_combat(attacker: &Unit, defender: &Unit) -> (UnitResult, UnitResul
             status_effects: effects_to_defender,
         },
     )
+}
+
+pub fn multi_combat_score<I1, I2>(attackers: I1, defenders: I2) -> f32
+where
+    I1: IntoIterator<Item = Unit>,
+    I2: IntoIterator<Item = Unit>,
+{
+    let mut score = 0.0;
+    let mut defenders = defenders.into_iter();
+    let mut defender = defenders.next();
+    if defender.is_none() {
+        return score;
+    }
+
+    for attacker in attackers {
+        let defender_mut = defender.as_mut().unwrap();
+
+        let (to_attacker, to_defender) = single_combat(&attacker, &defender_mut);
+
+        score -= if to_attacker.damage > attacker.current_hp {
+            attacker.current_hp
+        } else {
+            to_attacker.damage
+        };
+
+        if to_defender.damage >= defender_mut.current_hp {
+            score += defender_mut.current_hp;
+            defender = defenders.next();
+            if defender.is_none() {
+                break;
+            }
+            continue;
+        } else {
+            score += to_defender.damage;
+        };
+
+        defender_mut.current_hp -= to_defender.damage;
+        defender_mut
+            .status_effects
+            .insert(to_defender.status_effects);
+    }
+
+    score
+}
+
+pub struct CombatEvent {
+    pub attacker: Unit,
+    pub defender: Unit,
+    pub damage_to_attacker: i32,
+    pub damage_to_defender: i32,
+    pub status_effects_to_attacker: StatusEffects,
+    pub status_effects_to_defender: StatusEffects,
 }
 
 #[cfg(test)]
@@ -195,5 +251,58 @@ mod tests {
         assert_eq!(defender_result.damage, 5.0);
         assert_eq!(attacker_result.status_effects, StatusEffects::empty());
         assert_eq!(defender_result.status_effects, StatusEffects::empty());
+    }
+
+    #[test]
+    fn test_je_4_wa() {
+        let attacker = Unit::new(UnitType::Jelly).with_current_hp(4.0);
+        let defender = Unit::new(UnitType::Warrior);
+
+        let (attacker_result, defender_result) = single_combat(&attacker, &defender);
+        assert_eq!(attacker_result.damage, 8.0);
+        assert_eq!(defender_result.damage, 2.0);
+        assert_eq!(attacker_result.status_effects, StatusEffects::empty());
+        assert_eq!(defender_result.status_effects, StatusEffects::empty());
+    }
+
+    #[test]
+    fn test_wa_wa_vs_wa_d() {
+        let attackers = [Unit::new(UnitType::Warrior), Unit::new(UnitType::Warrior)];
+        let defenders =
+            [Unit::new(UnitType::Warrior).with_status_effects(StatusEffects::FORTIFIED)];
+
+        let score = multi_combat_score(attackers, defenders);
+
+        assert_eq!(score, 0.0);
+    }
+
+    #[test]
+    fn test_wa_wa_wa_vs_wa_d() {
+        let attackers = [
+            Unit::new(UnitType::Warrior),
+            Unit::new(UnitType::Warrior),
+            Unit::new(UnitType::Warrior),
+        ];
+        let defenders =
+            [Unit::new(UnitType::Warrior).with_status_effects(StatusEffects::FORTIFIED)];
+
+        let score = multi_combat_score(attackers, defenders);
+
+        assert_eq!(score, 1.0);
+    }
+
+    #[test]
+    fn test_wa_wa_wa_wa_wa_vs_je() {
+        let attackers = [
+            Unit::new(UnitType::Warrior),
+            Unit::new(UnitType::Warrior),
+            Unit::new(UnitType::Warrior),
+            Unit::new(UnitType::Warrior),
+            Unit::new(UnitType::Warrior),
+        ];
+        let defenders = [Unit::new(UnitType::Jelly)];
+
+        let score = multi_combat_score(attackers, defenders);
+        assert_eq!(score, 2.0);
     }
 }

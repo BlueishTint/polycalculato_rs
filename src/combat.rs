@@ -1,4 +1,6 @@
-use crate::unit::{StatusEffects, Unit};
+use crate::unit::{StatusEffects, Unit, Units};
+
+// use itertools::Itertools;
 
 const ELIPSON: f32 = 1e-6;
 
@@ -143,48 +145,39 @@ pub fn single_combat(attacker: &Unit, defender: &Unit) -> (UnitResult, UnitResul
     )
 }
 
-pub fn multi_combat_score<I1, I2>(attackers: I1, defenders: I2) -> f32
-where
-    I1: IntoIterator<Item = Unit>,
-    I2: IntoIterator<Item = Unit>,
-{
+pub fn multi_combat_score(attackers: &Units, mut defenders: Units) -> f32 {
     let mut score = 0.0;
-    let mut defenders = defenders.into_iter();
-    let mut defender = defenders.next();
-    if defender.is_none() {
-        return score;
-    }
+    let mut d_idx = 0;
 
-    for attacker in attackers {
-        let defender_mut = defender.as_mut().unwrap();
+    let d_len = defenders.len();
 
-        let (to_attacker, to_defender) = single_combat(&attacker, &defender_mut);
+    for attacker in attackers.iter() {
+        if d_idx >= d_len {
+            break;
+        }
 
-        score -= if to_attacker.damage > attacker.current_hp {
-            attacker.current_hp
+        let defender = &mut defenders[d_idx];
+
+        let (to_attacker, to_defender) = single_combat(attacker, defender);
+
+        score -= to_attacker.damage.min(attacker.current_hp);
+        score += to_defender.damage.min(defender.current_hp);
+
+        if to_defender.damage >= defender.current_hp {
+            d_idx += 1;
         } else {
-            to_attacker.damage
-        };
-
-        if to_defender.damage >= defender_mut.current_hp {
-            score += defender_mut.current_hp;
-            defender = defenders.next();
-            if defender.is_none() {
-                break;
-            }
-            continue;
-        } else {
-            score += to_defender.damage;
-        };
-
-        defender_mut.current_hp -= to_defender.damage;
-        defender_mut
-            .status_effects
-            .insert(to_defender.status_effects);
+            defender.current_hp -= to_defender.damage;
+            defender.apply_status_effects(to_defender.status_effects);
+        }
     }
 
     score
 }
+
+// fn optimized(attackers: &[Unit], defenders: &[Unit]) -> (Vec<Unit>, Vec<Unit>)
+// {
+//     let mut attackers_perms = attackers.iter().permutations(attackers.len());
+// }
 
 pub struct CombatEvent {
     pub attacker: Unit,
@@ -267,42 +260,42 @@ mod tests {
 
     #[test]
     fn test_wa_wa_vs_wa_d() {
-        let attackers = [Unit::new(UnitType::Warrior), Unit::new(UnitType::Warrior)];
-        let defenders =
-            [Unit::new(UnitType::Warrior).with_status_effects(StatusEffects::FORTIFIED)];
-
-        let score = multi_combat_score(attackers, defenders);
+        let attackers = Units::from([Unit::new(UnitType::Warrior), Unit::new(UnitType::Warrior)]);
+        let defenders = Units::from([
+            Unit::new(UnitType::Warrior).with_status_effects(StatusEffects::FORTIFIED)
+        ]);
+        let score = multi_combat_score(&attackers, defenders);
 
         assert_eq!(score, 0.0);
     }
 
     #[test]
     fn test_wa_wa_wa_vs_wa_d() {
-        let attackers = [
+        let attackers = Units::from([
             Unit::new(UnitType::Warrior),
             Unit::new(UnitType::Warrior),
             Unit::new(UnitType::Warrior),
-        ];
-        let defenders =
-            [Unit::new(UnitType::Warrior).with_status_effects(StatusEffects::FORTIFIED)];
-
-        let score = multi_combat_score(attackers, defenders);
+        ]);
+        let defenders = Units::from([
+            Unit::new(UnitType::Warrior).with_status_effects(StatusEffects::FORTIFIED)
+        ]);
+        let score = multi_combat_score(&attackers, defenders);
 
         assert_eq!(score, 1.0);
     }
 
     #[test]
     fn test_wa_wa_wa_wa_wa_vs_je() {
-        let attackers = [
+        let attackers = Units::from([
             Unit::new(UnitType::Warrior),
             Unit::new(UnitType::Warrior),
             Unit::new(UnitType::Warrior),
             Unit::new(UnitType::Warrior),
             Unit::new(UnitType::Warrior),
-        ];
-        let defenders = [Unit::new(UnitType::Jelly)];
+        ]);
+        let defenders = Units::from([Unit::new(UnitType::Jelly)]);
 
-        let score = multi_combat_score(attackers, defenders);
+        let score = multi_combat_score(&attackers, defenders);
         assert_eq!(score, 2.0);
     }
 }

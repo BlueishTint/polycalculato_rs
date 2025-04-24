@@ -2,6 +2,8 @@ use generated::UNIT_TYPE_DATA;
 
 mod generated;
 
+const MAX_UNITS: usize = 20;
+
 bitflags::bitflags! {
     /// A unit status effect.
     #[derive(PartialEq, Eq, Hash, Debug, Copy, Clone)]
@@ -178,8 +180,7 @@ impl Unit {
     }
 
     pub fn with_status_effects(mut self, status_effects: StatusEffects) -> Self {
-        self.status_effects = status_effects;
-        self.apply_status_effects();
+        self.apply_status_effects(status_effects);
         self
     }
 
@@ -189,15 +190,59 @@ impl Unit {
     }
 
     #[inline]
-    fn apply_status_effects(&mut self) {
-        if self.status_effects.contains(StatusEffects::POISONED) {
+    pub fn apply_status_effects(&mut self, status_effects: StatusEffects) {
+        self.status_effects.insert(status_effects);
+
+        if status_effects.contains(StatusEffects::POISONED) {
             self.defense_bonus = 0.7;
         }
-        if self.status_effects.contains(StatusEffects::WALLED) {
+        if status_effects.contains(StatusEffects::WALLED) {
             self.defense_bonus = 4.0;
         }
-        if self.status_effects.contains(StatusEffects::FORTIFIED) {
+        if status_effects.contains(StatusEffects::FORTIFIED) {
             self.defense_bonus = 1.5;
         }
+    }
+}
+
+impl Default for Unit {
+    fn default() -> Self {
+        Self::new(UnitType::DefaultWarrior)
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct Units([Unit; MAX_UNITS]);
+
+impl<const N: usize> From<[Unit; N]> for Units {
+    fn from(src: [Unit; N]) -> Self {
+        let mut ret = Units::default();
+        // only copy up to MAX_UNITS
+        let count = N.min(MAX_UNITS);
+        ret[..count].clone_from_slice(&src[..count]);
+        ret
+    }
+}
+
+impl FromIterator<Unit> for Units {
+    fn from_iter<I: IntoIterator<Item = Unit>>(iter: I) -> Self {
+        let mut ret = Units::default();
+        for (i, unit) in iter.into_iter().take(MAX_UNITS).enumerate() {
+            ret.0[i] = unit;
+        }
+        ret
+    }
+}
+
+impl std::ops::Deref for Units {
+    type Target = [Unit];
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl std::ops::DerefMut for Units {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
     }
 }

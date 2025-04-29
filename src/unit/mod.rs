@@ -1,4 +1,5 @@
 use generated::UNIT_TYPE_DATA;
+use strum::IntoStaticStr;
 
 mod generated;
 
@@ -31,7 +32,7 @@ bitflags::bitflags! {
     }
 }
 
-#[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
+#[derive(PartialEq, Eq, Hash, Debug, Clone, Copy, IntoStaticStr)]
 pub enum UnitType {
     Archer,
     ArcherBomber,
@@ -162,6 +163,7 @@ pub enum UnitType {
 
 #[derive(Debug, Clone)]
 pub struct Unit {
+    pub unit_type: UnitType,
     pub range: u8,
     pub status_effects: StatusEffects,
     pub trait_effects: StatusEffects,

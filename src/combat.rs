@@ -1,4 +1,4 @@
-use crate::unit::{StatusEffects, Unit, Units};
+use crate::unit::{StatusEffects, Unit, UnitType, Units};
 use itertools::Itertools;
 
 // use itertools::Itertools;
@@ -57,19 +57,14 @@ pub struct UnitResult {
     pub status_effects: StatusEffects,
 }
 
-#[inline]
-fn is_jelly(unit: &Unit) -> bool {
-    !unit.retaliates && unit.max_hp == 20.0
-}
-
 pub fn single_combat(attacker: &Unit, defender: &Unit) -> (UnitResult, UnitResult) {
     let mut tentacle_damage = 0.0;
     let mut takes_retaliation = false;
 
     let defender_in_range = defender.range >= attacker.range;
 
-    if is_jelly(defender) {
-        if is_jelly(attacker) {
+    if defender.unit_type == UnitType::Jelly {
+        if attacker.unit_type == UnitType::Jelly {
             takes_retaliation = true;
         } else if defender_in_range {
             tentacle_damage = calculate_attacker_damage(
@@ -179,12 +174,83 @@ pub fn multi_combat_score(
     score
 }
 
+#[derive(Debug)]
+pub struct CombatEvent {
+    pub attacker: Unit,
+    pub defender: Unit,
+    pub damage_to_attacker: f32,
+    pub damage_to_defender: f32,
+    pub status_effects_to_attacker: StatusEffects,
+    pub status_effects_to_defender: StatusEffects,
+}
+
+#[derive(Debug)]
+pub struct CombatLog(Vec<CombatEvent>);
+
+impl CombatLog {
+    pub fn new() -> Self {
+        Self(Vec::new())
+    }
+}
+
+impl std::ops::Deref for CombatLog {
+    type Target = Vec<CombatEvent>;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl std::ops::DerefMut for CombatLog {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+fn multi_combat_log(
+    attackers: &Units,
+    n_attackers: usize,
+    mut defenders: Units,
+    n_defenders: usize,
+) -> CombatLog {
+    let mut log = CombatLog::new();
+    let mut d_idx = 0;
+
+    for a_idx in 0..n_attackers {
+        let attacker = &attackers[a_idx];
+        if d_idx >= n_defenders {
+            break;
+        }
+
+        let defender = &mut defenders[d_idx];
+
+        let (to_attacker, to_defender) = single_combat(attacker, defender);
+
+        log.push(CombatEvent {
+            attacker: attacker.clone(),
+            defender: defender.clone(),
+            damage_to_attacker: to_attacker.damage,
+            damage_to_defender: to_defender.damage,
+            status_effects_to_attacker: to_attacker.status_effects,
+            status_effects_to_defender: to_defender.status_effects,
+        });
+
+        if to_defender.damage >= defender.current_hp {
+            d_idx += 1;
+        } else {
+            defender.current_hp -= to_defender.damage;
+            defender.apply_status_effects(to_defender.status_effects);
+        }
+    }
+
+    log
+}
+
 pub fn optimized(
     attackers: Units,
     n_attackers: usize,
     defenders: Units,
     n_defenders: usize,
-) -> (f32, Units, Units) {
+) -> (f32, CombatLog) {
     let attackers_perms = attackers
         .iter()
         .cloned()
@@ -214,16 +280,15 @@ pub fn optimized(
         }
     }
 
-    return (top_score, best_attacker_order, best_defender_order);
-}
-
-pub struct CombatEvent {
-    pub attacker: Unit,
-    pub defender: Unit,
-    pub damage_to_attacker: i32,
-    pub damage_to_defender: i32,
-    pub status_effects_to_attacker: StatusEffects,
-    pub status_effects_to_defender: StatusEffects,
+    return (
+        top_score,
+        multi_combat_log(
+            &best_attacker_order,
+            n_attackers,
+            best_defender_order,
+            n_defenders,
+        ),
+    );
 }
 
 #[cfg(test)]

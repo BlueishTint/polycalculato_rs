@@ -1,21 +1,17 @@
-use polycalculato_rs::combat::{UnitResult, single_combat};
-use polycalculato_rs::unit::{StatusEffects, Unit, UnitType};
+use polycalculato_rs::combat::optimized;
+use polycalculato_rs::unit::{Unit, UnitType, Units};
 
 fn main() {
-    let attacker = Unit::new(UnitType::Warrior);
-    let defender = Unit::new(UnitType::Archer);
-    let mut result = (
-        UnitResult {
-            damage: 0.0,
-            status_effects: StatusEffects::empty(),
-        },
-        UnitResult {
-            damage: 0.0,
-            status_effects: StatusEffects::empty(),
-        },
-    );
-    for _ in 0..100000 {
-        result = single_combat(&attacker, &defender);
-    }
-    println!("{:?}", result);
+    let attackers = Units::from([
+        Unit::new(UnitType::Warrior),
+        Unit::new(UnitType::Rider),
+        Unit::new(UnitType::Rider),
+        Unit::new(UnitType::Rider),
+        Unit::new(UnitType::Rider),
+        Unit::new(UnitType::Rider),
+        Unit::new(UnitType::Rider),
+        Unit::new(UnitType::Rider).with_current_hp(6.0),
+    ]);
+    let defenders = Units::from([Unit::new(UnitType::Giant)]);
+    dbg!(optimized(attackers, 8, defenders, 1));
 }

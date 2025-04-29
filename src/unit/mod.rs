@@ -228,7 +228,7 @@ impl FromIterator<Unit> for Units {
     fn from_iter<I: IntoIterator<Item = Unit>>(iter: I) -> Self {
         let mut ret = Units::default();
         for (i, unit) in iter.into_iter().take(MAX_UNITS).enumerate() {
-            ret.0[i] = unit;
+            ret[i] = unit;
         }
         ret
     }

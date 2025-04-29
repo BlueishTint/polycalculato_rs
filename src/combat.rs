@@ -1,4 +1,5 @@
 use crate::unit::{StatusEffects, Unit, Units};
+use itertools::Itertools;
 
 // use itertools::Itertools;
 
@@ -45,7 +46,7 @@ fn calculate_attacker_damage(
         return 0.0;
     }
 
-    let to_defender = (attack_force / total_damage * attack * 4.5 + ELIPSON).round();
+    let to_defender = (attack_force / total_damage * attack.mul_add(4.5, ELIPSON)).round();
 
     to_defender
 }
@@ -145,14 +146,18 @@ pub fn single_combat(attacker: &Unit, defender: &Unit) -> (UnitResult, UnitResul
     )
 }
 
-pub fn multi_combat_score(attackers: &Units, mut defenders: Units) -> f32 {
+pub fn multi_combat_score(
+    attackers: &Units,
+    n_attackers: usize,
+    mut defenders: Units,
+    n_defenders: usize,
+) -> f32 {
     let mut score = 0.0;
     let mut d_idx = 0;
 
-    let d_len = defenders.len();
-
-    for attacker in attackers.iter() {
-        if d_idx >= d_len {
+    for a_idx in 0..n_attackers {
+        let attacker = &attackers[a_idx];
+        if d_idx >= n_defenders {
             break;
         }
 
@@ -174,10 +179,43 @@ pub fn multi_combat_score(attackers: &Units, mut defenders: Units) -> f32 {
     score
 }
 
-// fn optimized(attackers: &[Unit], defenders: &[Unit]) -> (Vec<Unit>, Vec<Unit>)
-// {
-//     let mut attackers_perms = attackers.iter().permutations(attackers.len());
-// }
+pub fn optimized(
+    attackers: Units,
+    n_attackers: usize,
+    defenders: Units,
+    n_defenders: usize,
+) -> (f32, Units, Units) {
+    let attackers_perms = attackers
+        .iter()
+        .cloned()
+        .take(n_attackers)
+        .permutations(n_attackers)
+        .map(|us| Units::from_iter(us.into_iter()))
+        .collect::<Vec<Units>>();
+    let defenders_perms = defenders
+        .iter()
+        .cloned()
+        .take(n_defenders)
+        .permutations(n_defenders)
+        .map(|us| Units::from_iter(us.into_iter()))
+        .collect::<Vec<Units>>();
+
+    let mut top_score = f32::MIN;
+    let mut best_attacker_order: Units = Units::default();
+    let mut best_defender_order: Units = Units::default();
+    for attackers in &attackers_perms {
+        for defenders in &defenders_perms {
+            let score = multi_combat_score(attackers, n_attackers, defenders.clone(), n_defenders);
+            if score > top_score {
+                top_score = score;
+                best_attacker_order = attackers.clone();
+                best_defender_order = defenders.clone();
+            }
+        }
+    }
+
+    return (top_score, best_attacker_order, best_defender_order);
+}
 
 pub struct CombatEvent {
     pub attacker: Unit,
@@ -264,7 +302,7 @@ mod tests {
         let defenders = Units::from([
             Unit::new(UnitType::Warrior).with_status_effects(StatusEffects::FORTIFIED)
         ]);
-        let score = multi_combat_score(&attackers, defenders);
+        let score = multi_combat_score(&attackers, 2, defenders, 1);
 
         assert_eq!(score, 0.0);
     }
@@ -279,7 +317,7 @@ mod tests {
         let defenders = Units::from([
             Unit::new(UnitType::Warrior).with_status_effects(StatusEffects::FORTIFIED)
         ]);
-        let score = multi_combat_score(&attackers, defenders);
+        let score = multi_combat_score(&attackers, 3, defenders, 1);
 
         assert_eq!(score, 1.0);
     }
@@ -295,7 +333,7 @@ mod tests {
         ]);
         let defenders = Units::from([Unit::new(UnitType::Jelly)]);
 
-        let score = multi_combat_score(&attackers, defenders);
+        let score = multi_combat_score(&attackers, 5, defenders, 1);
         assert_eq!(score, 2.0);
     }
 }

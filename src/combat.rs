@@ -291,6 +291,27 @@ pub fn optimized(
     );
 }
 
+pub fn bulk(attacker: &Unit, mut defender: Unit) -> u32 {
+    let mut n_attacks = 0;
+
+    while defender.current_hp > 0.0 {
+        n_attacks += 1;
+
+        let damage_to_defender = calculate_attacker_damage(
+            attacker.attack,
+            defender.defense,
+            attacker.current_hp / attacker.max_hp,
+            defender.current_hp / defender.max_hp,
+            defender.defense_bonus,
+        );
+
+        defender.current_hp -= damage_to_defender;
+        defender.apply_status_effects(attacker.trait_effects);
+    }
+
+    n_attacks
+}
+
 #[cfg(test)]
 mod tests {
     use crate::unit::UnitType;

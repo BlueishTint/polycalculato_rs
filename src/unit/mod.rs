@@ -195,14 +195,14 @@ impl Unit {
     pub fn apply_status_effects(&mut self, status_effects: StatusEffects) {
         self.status_effects.insert(status_effects);
 
-        if status_effects.contains(StatusEffects::POISONED) {
-            self.defense_bonus = 0.7;
-        }
-        if status_effects.contains(StatusEffects::WALLED) {
-            self.defense_bonus = 4.0;
-        }
-        if status_effects.contains(StatusEffects::FORTIFIED) {
-            self.defense_bonus = 1.5;
+        self.defense_bonus = if status_effects.contains(StatusEffects::POISONED) {
+            0.7
+        } else if status_effects.contains(StatusEffects::WALLED) {
+            4.0
+        } else if status_effects.contains(StatusEffects::FORTIFIED) {
+            1.5
+        } else {
+            1.0
         }
     }
 }

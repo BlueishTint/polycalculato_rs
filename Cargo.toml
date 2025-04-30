@@ -33,7 +33,3 @@ harness = false
 [[bench]]
 name = "bench_optim"
 harness = false
-
-# [[bench]]
-# name = "bench_optim"
-# harness = false

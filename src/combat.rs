@@ -46,9 +46,7 @@ fn calculate_attacker_damage(
         return 0.0;
     }
 
-    let to_defender = (attack_force / total_damage * attack.mul_add(4.5, ELIPSON)).round();
-
-    to_defender
+    (attack_force / total_damage * attack.mul_add(4.5, ELIPSON)).round()
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -193,6 +191,12 @@ impl CombatLog {
     }
 }
 
+impl Default for CombatLog {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl std::ops::Deref for CombatLog {
     type Target = Vec<CombatEvent>;
     fn deref(&self) -> &Self::Target {
@@ -253,17 +257,17 @@ pub fn optimized(
 ) -> (f32, CombatLog) {
     let attackers_perms = attackers
         .iter()
-        .cloned()
         .take(n_attackers)
+        .cloned()
         .permutations(n_attackers)
-        .map(|us| Units::from_iter(us.into_iter()))
+        .map(Units::from_iter)
         .collect::<Vec<Units>>();
     let defenders_perms = defenders
         .iter()
-        .cloned()
         .take(n_defenders)
+        .cloned()
         .permutations(n_defenders)
-        .map(|us| Units::from_iter(us.into_iter()))
+        .map(Units::from_iter)
         .collect::<Vec<Units>>();
 
     let mut top_score = f32::MIN;
@@ -280,7 +284,7 @@ pub fn optimized(
         }
     }
 
-    return (
+    (
         top_score,
         multi_combat_log(
             &best_attacker_order,
@@ -288,7 +292,7 @@ pub fn optimized(
             best_defender_order,
             n_defenders,
         ),
-    );
+    )
 }
 
 pub fn bulk(attacker: &Unit, mut defender: Unit) -> u32 {

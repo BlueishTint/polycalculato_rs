@@ -25,7 +25,7 @@ fn main() {
     let mut out = String::new();
     out.push_str("// AUTO-GENERATED FILE, DO NOT EDIT\n");
     out.push_str("use crate::unit::{StatusEffects, Unit, UnitType};\n\n");
-    out.push_str("pub const UNIT_TYPE_DATA: &'static [Unit] = &[\n");
+    out.push_str("pub const UNIT_TYPE_DATA: &[Unit] = &[\n");
 
     for (name, data) in raw_unit_data {
         if let Some(trait_effects) = data.trait_effects {

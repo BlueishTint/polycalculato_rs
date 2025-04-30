@@ -41,7 +41,7 @@ mod utils {
                     .round() as i32)
                     .to_string(),
             );
-            out.push_str("\n");
+            out.push('\n');
         }
 
         out.push_str("\n**Defender (statusEffects): startHP ➔ endHP**\n");
@@ -63,7 +63,7 @@ mod utils {
                     .round() as i32)
                     .to_string(),
             );
-            out.push_str("\n");
+            out.push('\n');
         }
 
         out

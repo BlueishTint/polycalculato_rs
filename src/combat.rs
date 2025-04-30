@@ -312,6 +312,53 @@ pub fn bulk(attacker: &Unit, mut defender: Unit) -> u32 {
     n_attacks
 }
 
+pub fn eliminate_defender(attacker: &Unit, mut defender: Unit) -> f32 {
+    let mut i: u16 = 0;
+
+    loop {
+        defender.current_hp = defender.max_hp - i as f32;
+
+        let damage_to_defender = calculate_attacker_damage(
+            attacker.attack,
+            defender.defense,
+            attacker.current_hp / attacker.max_hp,
+            defender.current_hp / defender.max_hp,
+            defender.defense_bonus,
+        );
+
+        if defender.current_hp <= damage_to_defender {
+            break;
+        }
+        i += 1;
+    }
+
+    defender.max_hp - (i as f32)
+}
+
+pub fn eliminate_attacker(mut attacker: Unit, defender: &Unit) -> f32 {
+    let mut i: u16 = 0;
+
+    loop {
+        attacker.current_hp = i as f32;
+
+        let damage_to_defender = calculate_attacker_damage(
+            attacker.attack,
+            defender.defense,
+            attacker.current_hp / attacker.max_hp,
+            defender.current_hp / defender.max_hp,
+            defender.defense_bonus,
+        );
+
+        if defender.current_hp <= damage_to_defender {
+            break;
+        }
+
+        i += 1;
+    }
+
+    i as f32
+}
+
 #[cfg(test)]
 mod tests {
     use crate::unit::UnitType;
@@ -421,5 +468,65 @@ mod tests {
 
         let score = multi_combat_score(&attackers, 5, defenders, 1);
         assert_eq!(score, 2.0);
+    }
+
+    #[test]
+    fn test_b_ri_gi() {
+        let attacker = Unit::new(UnitType::Rider);
+        let defender = Unit::new(UnitType::Giant);
+
+        let n_attacks = bulk(&attacker, defender);
+
+        assert_eq!(n_attacks, 10);
+    }
+
+    #[test]
+    fn test_b_sh_5_gi() {
+        let attacker = Unit::new(UnitType::Shaman).with_current_hp(5.0);
+        let defender = Unit::new(UnitType::Giant);
+
+        let n_attacks = bulk(&attacker, defender);
+
+        assert_eq!(n_attacks, 35);
+    }
+
+    #[test]
+    fn test_e_wa_ri_u() {
+        let attacker = Unit::new(UnitType::Warrior);
+        let defender = Unit::new(UnitType::Rider);
+
+        let max_hp = eliminate_defender(&attacker, defender);
+
+        assert_eq!(max_hp, 7.0);
+    }
+
+    #[test]
+    fn test_e_sh_1_gi_u() {
+        let attacker = Unit::new(UnitType::Shaman).with_current_hp(1.0);
+        let defender = Unit::new(UnitType::Giant);
+
+        let max_hp = eliminate_defender(&attacker, defender);
+
+        assert_eq!(max_hp, 2.0);
+    }
+
+    #[test]
+    fn test_e_wa_u_ri_4() {
+        let attacker = Unit::new(UnitType::Warrior);
+        let defender = Unit::new(UnitType::Rider).with_current_hp(4.0);
+
+        let min_hp = eliminate_attacker(attacker, &defender);
+
+        assert_eq!(min_hp, 2.0);
+    }
+
+    #[test]
+    fn test_e_gi_u_gi_15() {
+        let attacker = Unit::new(UnitType::Giant);
+        let defender = Unit::new(UnitType::Giant).with_current_hp(15.0);
+
+        let min_hp = eliminate_attacker(attacker, &defender);
+
+        assert_eq!(min_hp, 22.0);
     }
 }

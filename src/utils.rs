@@ -1,13 +1,13 @@
-pub struct Permutations<T: Copy, const N: usize> {
+pub struct Perms<T: Clone, const N: usize> {
     arr: [T; N],
     c: [usize; N],
     i: usize,
     first_iter: bool,
 }
 
-impl<T: Copy, const N: usize> Permutations<T, N> {
+impl<T: Clone, const N: usize> Perms<T, N> {
     pub fn new(arr: [T; N]) -> Self {
-        Permutations {
+        Self {
             arr,
             c: [0; N],
             i: 0,
@@ -16,14 +16,14 @@ impl<T: Copy, const N: usize> Permutations<T, N> {
     }
 }
 
-impl<T: Copy, const N: usize> Iterator for Permutations<T, N> {
+impl<T: Clone, const N: usize> Iterator for Perms<T, N> {
     type Item = [T; N];
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.first_iter {
             self.first_iter = false;
             self.i += 1;
-            return Some(self.arr);
+            return Some(self.arr.clone());
         }
 
         while self.i < N {
@@ -37,7 +37,7 @@ impl<T: Copy, const N: usize> Iterator for Permutations<T, N> {
                 self.c[self.i] += 1;
                 self.i = 0;
 
-                return Some(self.arr);
+                return Some(self.arr.clone());
             } else {
                 self.c[self.i] = 0;
                 self.i += 1;
@@ -45,5 +45,15 @@ impl<T: Copy, const N: usize> Iterator for Permutations<T, N> {
         }
 
         None
+    }
+}
+
+pub trait Permutations<T: Clone, const N: usize> {
+    fn permutations(self) -> Perms<T, N>;
+}
+
+impl<T: Clone, const N: usize> Permutations<T, N> for [T; N] {
+    fn permutations(self) -> Perms<T, N> {
+        Perms::new(self)
     }
 }

@@ -1,7 +1,5 @@
 use crate::unit::{StatusEffects, Unit, UnitType, Units};
-use itertools::Itertools;
-
-// use itertools::Itertools;
+use crate::utils::Permutations;
 
 const ELIPSON: f32 = 1e-6;
 
@@ -255,31 +253,21 @@ pub fn optimized(
     defenders: Units,
     n_defenders: usize,
 ) -> (f32, CombatLog) {
-    let attackers_perms = attackers
-        .iter()
-        .take(n_attackers)
-        .cloned()
-        .permutations(n_attackers)
-        .map(Units::from_iter)
-        .collect::<Vec<Units>>();
-    let defenders_perms = defenders
-        .iter()
-        .take(n_defenders)
-        .cloned()
-        .permutations(n_defenders)
-        .map(Units::from_iter)
-        .collect::<Vec<Units>>();
+    todo!("Currently broken!");
+
+    let attackers_perms = attackers.permutations().map(Units::from);
+    let defenders_perms = || defenders.clone().permutations().map(Units::from);
 
     let mut top_score = f32::MIN;
     let mut best_attacker_order: Units = Units::default();
     let mut best_defender_order: Units = Units::default();
-    for attackers in &attackers_perms {
-        for defenders in &defenders_perms {
-            let score = multi_combat_score(attackers, n_attackers, defenders.clone(), n_defenders);
+    for attackers in attackers_perms {
+        for defenders in defenders_perms() {
+            let score = multi_combat_score(&attackers, n_attackers, defenders.clone(), n_defenders);
             if score > top_score {
                 top_score = score;
                 best_attacker_order = attackers.clone();
-                best_defender_order = defenders.clone();
+                best_defender_order = defenders;
             }
         }
     }
@@ -391,6 +379,21 @@ mod tests {
 
         assert_eq!(attacker_result.damage, 5.0);
         assert_eq!(defender_result.damage, 4.0);
+        assert_eq!(attacker_result.status_effects, StatusEffects::empty());
+        assert_eq!(defender_result.status_effects, StatusEffects::empty());
+    }
+
+    #[test]
+    fn test_wa_wa_d_6() {
+        let attacker = Unit::new(UnitType::Warrior);
+        let defender = Unit::new(UnitType::Warrior)
+            .with_status_effects(StatusEffects::FORTIFIED)
+            .with_current_hp(6.0);
+
+        let (attacker_result, defender_result) = single_combat(&attacker, &defender);
+
+        assert_eq!(attacker_result.damage, 4.0);
+        assert_eq!(defender_result.damage, 5.0);
         assert_eq!(attacker_result.status_effects, StatusEffects::empty());
         assert_eq!(defender_result.status_effects, StatusEffects::empty());
     }

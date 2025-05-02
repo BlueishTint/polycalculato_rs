@@ -1,9 +1,11 @@
 use generated::UNIT_TYPE_DATA;
 use strum::IntoStaticStr;
 
+use crate::utils::{Perms, Permutations};
+
 mod generated;
 
-const MAX_UNITS: usize = 20;
+const MAX_UNITS: usize = 12;
 
 bitflags::bitflags! {
     /// A unit status effect.
@@ -195,11 +197,11 @@ impl Unit {
     pub fn apply_status_effects(&mut self, status_effects: StatusEffects) {
         self.status_effects.insert(status_effects);
 
-        self.defense_bonus = if status_effects.contains(StatusEffects::POISONED) {
+        self.defense_bonus = if self.status_effects.contains(StatusEffects::POISONED) {
             0.7
-        } else if status_effects.contains(StatusEffects::WALLED) {
+        } else if self.status_effects.contains(StatusEffects::WALLED) {
             4.0
-        } else if status_effects.contains(StatusEffects::FORTIFIED) {
+        } else if self.status_effects.contains(StatusEffects::FORTIFIED) {
             1.5
         } else {
             1.0
@@ -246,5 +248,11 @@ impl std::ops::Deref for Units {
 impl std::ops::DerefMut for Units {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
+    }
+}
+
+impl Permutations<Unit, MAX_UNITS> for Units {
+    fn permutations(self) -> Perms<Unit, MAX_UNITS> {
+        Perms::new(self.0)
     }
 }

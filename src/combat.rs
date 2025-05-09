@@ -1,5 +1,7 @@
-use crate::unit::{StatusEffects, Unit, UnitType, Units};
-use crate::utils::Permutations;
+use crate::{
+    unit::{StatusEffects, Unit, UnitType, Units},
+    utils::Perms,
+};
 
 const ELIPSON: f32 = 1e-6;
 
@@ -137,16 +139,12 @@ pub fn single_combat(attacker: &Unit, defender: &Unit) -> (UnitResult, UnitResul
     )
 }
 
-pub fn multi_combat_score(
-    attackers: &Units,
-    n_attackers: usize,
-    mut defenders: Units,
-    n_defenders: usize,
-) -> f32 {
+pub fn multi_combat_score(attackers: &Units, mut defenders: Units) -> f32 {
+    let n_defenders = defenders.len();
     let mut score = 0.0;
     let mut d_idx = 0;
 
-    for a_idx in 0..n_attackers {
+    for a_idx in 0..attackers.len() {
         let attacker = &attackers[a_idx];
         if d_idx >= n_defenders {
             break;
@@ -161,6 +159,7 @@ pub fn multi_combat_score(
 
         if to_defender.damage >= defender.current_hp {
             d_idx += 1;
+            score += 100.0;
         } else {
             defender.current_hp -= to_defender.damage;
             defender.apply_status_effects(to_defender.status_effects);
@@ -208,16 +207,13 @@ impl std::ops::DerefMut for CombatLog {
     }
 }
 
-fn multi_combat_log(
-    attackers: &Units,
-    n_attackers: usize,
-    mut defenders: Units,
-    n_defenders: usize,
-) -> CombatLog {
+pub fn multi_combat_log(attackers: &Units, mut defenders: Units) -> CombatLog {
     let mut log = CombatLog::new();
     let mut d_idx = 0;
 
-    for a_idx in 0..n_attackers {
+    let n_defenders = defenders.len();
+
+    for a_idx in 0..attackers.len() {
         let attacker = &attackers[a_idx];
         if d_idx >= n_defenders {
             break;
@@ -247,39 +243,32 @@ fn multi_combat_log(
     log
 }
 
-pub fn optimized(
-    attackers: Units,
-    n_attackers: usize,
-    defenders: Units,
-    n_defenders: usize,
-) -> (f32, CombatLog) {
-    todo!("Currently broken!");
-
-    let attackers_perms = attackers.permutations().map(Units::from);
-    let defenders_perms = || defenders.clone().permutations().map(Units::from);
+pub fn optimized(mut attackers: Units, mut defenders: Units) -> (f32, CombatLog) {
+    let attacker_pairs = Perms::new(attackers.len());
+    let n_defenders = defenders.len();
 
     let mut top_score = f32::MIN;
-    let mut best_attacker_order: Units = Units::default();
-    let mut best_defender_order: Units = Units::default();
-    for attackers in attackers_perms {
-        for defenders in defenders_perms() {
-            let score = multi_combat_score(&attackers, n_attackers, defenders.clone(), n_defenders);
+    let mut best_attacker_order: Units = Units::new();
+    let mut best_defender_order: Units = Units::new();
+    for (a_first, a_second) in attacker_pairs {
+        attackers.swap(a_first, a_second);
+
+        let defenders_perms = Perms::new(n_defenders);
+        for (d_first, d_second) in defenders_perms {
+            defenders.swap(d_first, d_second);
+
+            let score = multi_combat_score(&attackers, defenders.clone());
             if score > top_score {
                 top_score = score;
                 best_attacker_order = attackers.clone();
-                best_defender_order = defenders;
+                best_defender_order = defenders.clone();
             }
         }
     }
 
     (
         top_score,
-        multi_combat_log(
-            &best_attacker_order,
-            n_attackers,
-            best_defender_order,
-            n_defenders,
-        ),
+        multi_combat_log(&best_attacker_order, best_defender_order),
     )
 }
 
@@ -442,7 +431,7 @@ mod tests {
         let defenders = Units::from([
             Unit::new(UnitType::Warrior).with_status_effects(StatusEffects::FORTIFIED)
         ]);
-        let score = multi_combat_score(&attackers, 2, defenders, 1);
+        let score = multi_combat_score(&attackers, defenders);
 
         assert_eq!(score, 0.0);
     }
@@ -457,7 +446,7 @@ mod tests {
         let defenders = Units::from([
             Unit::new(UnitType::Warrior).with_status_effects(StatusEffects::FORTIFIED)
         ]);
-        let score = multi_combat_score(&attackers, 3, defenders, 1);
+        let score = multi_combat_score(&attackers, defenders);
 
         assert_eq!(score, 1.0);
     }
@@ -473,8 +462,26 @@ mod tests {
         ]);
         let defenders = Units::from([Unit::new(UnitType::Jelly)]);
 
-        let score = multi_combat_score(&attackers, 5, defenders, 1);
+        let score = multi_combat_score(&attackers, defenders);
         assert_eq!(score, 2.0);
+    }
+
+    #[test]
+    fn test_ri_6_wa_ar_3_kn_ca_5_v_ca_vs_gi() {
+        let attackers = Units::from([
+            Unit::new(UnitType::Rider).with_current_hp(6.0),
+            Unit::new(UnitType::Warrior),
+            Unit::new(UnitType::Archer).with_current_hp(3.0),
+            Unit::new(UnitType::Knight),
+            Unit::new(UnitType::Catapult)
+                .with_current_hp(5.0)
+                .with_status_effects(StatusEffects::VETERAN),
+            Unit::new(UnitType::Catapult),
+        ]);
+        let defenders = Units::from([Unit::new(UnitType::Giant)]);
+
+        let (score, _log) = optimized(attackers, defenders);
+        assert_eq!(score, 17.0);
     }
 
     #[test]

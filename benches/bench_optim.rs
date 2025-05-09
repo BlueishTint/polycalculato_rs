@@ -28,14 +28,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
     group.bench_function(
         "wa, ri, ri, ri, ri, ri, ri, ri 6, ar vs gi, ar, ar, ar",
         |b| {
-            b.iter(|| {
-                optimized(
-                    black_box(attackers.clone()),
-                    black_box(9),
-                    black_box(defenders.clone()),
-                    black_box(4),
-                )
-            });
+            b.iter(|| optimized(black_box(attackers.clone()), black_box(defenders.clone())));
         },
     );
     group.finish();
@@ -53,14 +46,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
     let defenders = Units::from([Unit::new(UnitType::Giant)]);
 
     c.bench_function("wa, ri, ri, ri, ri, ri, ri, ri 6 vs gi", |b| {
-        b.iter(|| {
-            optimized(
-                black_box(attackers.clone()),
-                black_box(8),
-                black_box(defenders.clone()),
-                black_box(1),
-            )
-        });
+        b.iter(|| optimized(black_box(attackers.clone()), black_box(defenders.clone())));
     });
 }
 

@@ -1,7 +1,8 @@
+use std::ops::Index;
+
+use arrayvec::ArrayVec;
 use generated::UNIT_TYPE_DATA;
 use strum::IntoStaticStr;
-
-use crate::utils::{Perms, Permutations};
 
 mod generated;
 
@@ -195,6 +196,12 @@ impl Unit {
 
     #[inline]
     pub fn apply_status_effects(&mut self, status_effects: StatusEffects) {
+        if status_effects.contains(StatusEffects::VETERAN)
+            && !self.status_effects.contains(StatusEffects::VETERAN)
+        {
+            self.max_hp += 5.0;
+        }
+
         self.status_effects.insert(status_effects);
 
         self.defense_bonus = if self.status_effects.contains(StatusEffects::POISONED) {
@@ -205,7 +212,7 @@ impl Unit {
             1.5
         } else {
             1.0
-        }
+        };
     }
 }
 
@@ -215,44 +222,53 @@ impl Default for Unit {
     }
 }
 
-#[derive(Debug, Clone, Default)]
-pub struct Units([Unit; MAX_UNITS]);
+#[derive(Debug, Clone)]
+pub struct Units(ArrayVec<Unit, MAX_UNITS>);
+
+impl Units {
+    pub fn new() -> Self {
+        Self { 0: ArrayVec::new() }
+    }
+
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    pub fn swap(&mut self, a: usize, b: usize) {
+        self.0.swap(a, b)
+    }
+}
 
 impl<const N: usize> From<[Unit; N]> for Units {
     fn from(src: [Unit; N]) -> Self {
-        let mut ret = Units::default();
-        // only copy up to MAX_UNITS
-        let count = N.min(MAX_UNITS);
-        ret[..count].clone_from_slice(&src[..count]);
-        ret
+        let mut out = Units::new();
+
+        out.0.extend(src);
+
+        out
     }
 }
 
 impl FromIterator<Unit> for Units {
     fn from_iter<I: IntoIterator<Item = Unit>>(iter: I) -> Self {
-        let mut ret = Units::default();
+        let mut ret = Units::new();
         for (i, unit) in iter.into_iter().take(MAX_UNITS).enumerate() {
-            ret[i] = unit;
+            ret.0[i] = unit;
         }
         ret
     }
 }
 
-impl std::ops::Deref for Units {
-    type Target = [Unit];
-    fn deref(&self) -> &Self::Target {
-        &self.0
+impl Index<usize> for Units {
+    type Output = Unit;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.0[index]
     }
 }
 
-impl std::ops::DerefMut for Units {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-impl Permutations<Unit, MAX_UNITS> for Units {
-    fn permutations(self) -> Perms<Unit, MAX_UNITS> {
-        Perms::new(self.0)
+impl std::ops::IndexMut<usize> for Units {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        &mut self.0[index]
     }
 }
